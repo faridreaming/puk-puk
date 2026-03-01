@@ -1,35 +1,29 @@
-import { useThemeStore } from "~/store/useThemeStore";
-import { Sun, Moon, Monitor } from "lucide-react";
+import { useThemeStore, applyTheme } from "~/store/useThemeStore";
+import { Sun, Moon } from "lucide-react";
+import { useEffect } from "react";
 
 export function ThemeToggle() {
   const theme = useThemeStore((s) => s.theme);
   const setTheme = useThemeStore((s) => s.setTheme);
 
-  const options = [
-    { value: "light" as const, icon: Sun, label: "Terang" },
-    { value: "dark" as const, icon: Moon, label: "Gelap" },
-    { value: "system" as const, icon: Monitor, label: "Sistem" },
-  ];
+  // Apply theme on mount and when it changes
+  useEffect(() => {
+    applyTheme(theme);
+  }, [theme]);
+
+  const isDark = theme === "dark" || (theme === "system" && typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+  const toggle = () => {
+    setTheme(isDark ? "light" : "dark");
+  };
 
   return (
-    <div className="flex items-center bg-zinc-200 dark:bg-zinc-800 rounded-lg p-0.5 gap-0.5">
-      {options.map((opt) => {
-        const Icon = opt.icon;
-        return (
-          <button
-            key={opt.value}
-            onClick={() => setTheme(opt.value)}
-            className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5 ${theme === opt.value
-                ? "bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-sm"
-                : "text-zinc-500 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
-              }`}
-            title={opt.label}
-          >
-            <Icon size={14} />
-            <span className="hidden sm:inline">{opt.label}</span>
-          </button>
-        );
-      })}
-    </div>
+    <button
+      onClick={toggle}
+      className="flex items-center gap-1.5 px-2 py-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-400 transition-all cursor-pointer border border-zinc-200 dark:border-zinc-700/50"
+      title={isDark ? "Mode terang" : "Mode gelap"}
+    >
+      {isDark ? <Sun size={16} /> : <Moon size={16} />}
+    </button>
   );
 }
