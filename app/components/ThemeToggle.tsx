@@ -1,15 +1,10 @@
-import { useThemeStore, applyTheme } from "~/store/useThemeStore";
+import { useThemeStore } from "~/store/useThemeStore";
 import { Sun, Moon } from "lucide-react";
 import { useEffect } from "react";
 
 export function ThemeToggle() {
   const theme = useThemeStore((s) => s.theme);
   const setTheme = useThemeStore((s) => s.setTheme);
-
-  // Apply theme on mount and when it changes
-  useEffect(() => {
-    applyTheme(theme);
-  }, [theme]);
 
   const isDark = theme === "dark" || (theme === "system" && typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches);
 

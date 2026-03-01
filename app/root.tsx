@@ -6,9 +6,11 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
+import { useEffect, useState } from "react";
 import { ToastContainer } from "~/components/ToastContainer";
 import { DevTools } from "~/components/DevTools";
 import { ConfirmDialog } from "~/components/ConfirmDialog";
+import { useThemeStore } from "~/store/useThemeStore";
 
 import type { Route } from "./+types/root";
 import "./app.css";
@@ -27,8 +29,23 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const theme = useThemeStore((s) => s.theme);
+  // Ensure we consistently use the resolved theme (dark or light)
+  const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">(
+    () => {
+      // During SSR, fallback to dark
+      if (typeof window === "undefined") return "dark";
+      // During client hydration, read the actual resolved theme synchronously
+      return useThemeStore.getState().getResolvedTheme();
+    }
+  );
+
+  useEffect(() => {
+    setResolvedTheme(useThemeStore.getState().getResolvedTheme());
+  }, [theme]);
+
   return (
-    <html lang="id" suppressHydrationWarning>
+    <html lang="id" className={resolvedTheme} suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
