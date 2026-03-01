@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router";
 import { useHabitStore, getStreak } from "~/store/useHabitStore";
 import { useToastStore } from "~/store/useToastStore";
+import { useDialogStore } from "~/store/useDialogStore";
 import { StageRoadmap } from "~/components/StageRoadmap";
 import { WeeklyTracker } from "~/components/WeeklyTracker";
 import { LivesIndicator } from "~/components/LivesIndicator";
@@ -24,11 +25,9 @@ export default function HabitDetail({ params }: Route.ComponentProps) {
   const undoToday = useHabitStore((s) => s.undoToday);
   const editHabit = useHabitStore((s) => s.editHabit);
   const addToast = useToastStore((s) => s.addToast);
+  const openDialog = useDialogStore((s) => s.openDialog);
   const navigate = useNavigate();
 
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [showResetConfirm, setShowResetConfirm] = useState(false);
-  const [showMissedConfirm, setShowMissedConfirm] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState("");
   const [editIcon, setEditIcon] = useState("");
@@ -65,26 +64,41 @@ export default function HabitDetail({ params }: Route.ComponentProps) {
   const streak = getStreak(habit.completedDates, habit.missedDates);
 
   const handleComplete = () => {
-    const result = markComplete(habit.id, today);
-    if (result.type === "complete") {
-      if (result.stageUp) {
-        addToast({ message: "Naik tahap! Lanjutkan, kamu hebat!", type: "celebration", duration: 4000 });
-      } else {
-        addToast({ message: "Mantap! Satu langkah lebih dekat!", type: "success" });
-      }
-    }
+    openDialog({
+      title: "Tandai selesai?",
+      message: `Tandai "${habit.name}" sebagai selesai untuk hari ini.`,
+      confirmLabel: "Ya, selesai",
+      variant: "info",
+      onConfirm: () => {
+        const result = markComplete(habit.id, today);
+        if (result.type === "complete") {
+          if (result.stageUp) {
+            addToast({ message: "Naik tahap! Lanjutkan, kamu hebat!", type: "celebration", duration: 4000 });
+          } else {
+            addToast({ message: "Mantap! Satu langkah lebih dekat!", type: "success" });
+          }
+        }
+      },
+    });
   };
 
   const handleMissed = () => {
-    const result = markMissed(habit.id, today);
-    setShowMissedConfirm(false);
-    if (result.type === "missed") {
-      if (result.stageDown) {
-        addToast({ message: "Turun tahap. Tidak apa-apa, mulai lagi perlahan.", type: "warning", duration: 4000 });
-      } else {
-        addToast({ message: "Terlewat hari ini. Besok coba lagi!", type: "info" });
-      }
-    }
+    openDialog({
+      title: "Tandai terlewat?",
+      message: "Hari ini akan ditandai sebagai terlewat. Nyawa akan berkurang.",
+      confirmLabel: "Ya, terlewat",
+      variant: "warning",
+      onConfirm: () => {
+        const result = markMissed(habit.id, today);
+        if (result.type === "missed") {
+          if (result.stageDown) {
+            addToast({ message: "Turun tahap. Tidak apa-apa, mulai lagi perlahan.", type: "warning", duration: 4000 });
+          } else {
+            addToast({ message: "Terlewat hari ini. Besok coba lagi!", type: "info" });
+          }
+        }
+      },
+    });
   };
 
   const handleUndo = () => {
@@ -92,6 +106,32 @@ export default function HabitDetail({ params }: Route.ComponentProps) {
     if (result.type === "undo") {
       addToast({ message: "Dibatalkan", type: "info", duration: 2000 });
     }
+  };
+
+  const handleReset = () => {
+    openDialog({
+      title: "Mulai ulang dari awal?",
+      message: "Semua progress akan direset. Kamu akan kembali ke tahap pertama.",
+      confirmLabel: "Ya, mulai ulang",
+      variant: "warning",
+      onConfirm: () => {
+        resetHabit(habit.id);
+        addToast({ message: "Direset ke awal", type: "info" });
+      },
+    });
+  };
+
+  const handleDelete = () => {
+    openDialog({
+      title: "Hapus kebiasaan ini?",
+      message: "Semua data dan progress akan dihapus permanen. Tindakan ini tidak bisa dibatalkan.",
+      confirmLabel: "Ya, hapus",
+      variant: "danger",
+      onConfirm: () => {
+        deleteHabit(habit.id);
+        navigate("/");
+      },
+    });
   };
 
   const startEditing = () => {
@@ -138,7 +178,7 @@ export default function HabitDetail({ params }: Route.ComponentProps) {
       </header>
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-6">
-        {/* Edit dialog */}
+        {/* Edit panel */}
         {isEditing && (
           <div className="bg-white dark:bg-zinc-900/80 backdrop-blur-sm border border-amber-300 dark:border-amber-500/20 rounded-2xl p-5 space-y-4 transition-colors">
             <h3 className="text-sm font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Edit Kebiasaan</h3>
@@ -239,22 +279,13 @@ export default function HabitDetail({ params }: Route.ComponentProps) {
                       <Undo2 size={16} />
                     </button>
                   </div>
-                ) : showMissedConfirm ? (
-                  <div className="flex gap-2">
-                    <button onClick={handleMissed} className="flex-1 py-3 rounded-xl bg-red-50 dark:bg-red-500/20 hover:bg-red-100 dark:hover:bg-red-500/30 text-red-600 dark:text-red-400 font-semibold text-sm transition-all active:scale-95 cursor-pointer border border-red-200 dark:border-red-500/20">
-                      Ya, terlewat
-                    </button>
-                    <button onClick={() => setShowMissedConfirm(false)} className="py-3 px-5 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-400 font-semibold text-sm transition-all active:scale-95 cursor-pointer border border-zinc-200 dark:border-zinc-700">
-                      Batal
-                    </button>
-                  </div>
                 ) : (
                   <div className="flex gap-2">
                     <button onClick={handleComplete} className="flex-1 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-semibold text-sm transition-all active:scale-95 cursor-pointer shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-1.5">
                       <Check size={16} />
                       Selesai
                     </button>
-                    <button onClick={() => setShowMissedConfirm(true)} className="py-3 px-5 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-400 font-semibold text-sm transition-all active:scale-95 cursor-pointer border border-zinc-200 dark:border-zinc-700">
+                    <button onClick={handleMissed} className="py-3 px-5 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-400 font-semibold text-sm transition-all active:scale-95 cursor-pointer border border-zinc-200 dark:border-zinc-700">
                       Terlewat
                     </button>
                   </div>
@@ -280,37 +311,15 @@ export default function HabitDetail({ params }: Route.ComponentProps) {
 
         {/* Danger Zone */}
         <div className="pt-4 border-t border-zinc-200 dark:border-zinc-800/50 space-y-3 transition-colors">
-          {showResetConfirm ? (
-            <div className="flex gap-2">
-              <button onClick={() => { resetHabit(habit.id); setShowResetConfirm(false); addToast({ message: "Direset ke awal", type: "info" }); }} className="flex-1 py-2.5 rounded-xl bg-amber-50 dark:bg-amber-500/20 hover:bg-amber-100 dark:hover:bg-amber-500/30 text-amber-600 dark:text-amber-400 text-sm font-semibold transition-all cursor-pointer border border-amber-200 dark:border-amber-500/20">
-                Ya, mulai ulang
-              </button>
-              <button onClick={() => setShowResetConfirm(false)} className="flex-1 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-400 text-sm font-medium transition-all cursor-pointer border border-zinc-200 dark:border-zinc-700">
-                Batal
-              </button>
-            </div>
-          ) : (
-            <button onClick={() => setShowResetConfirm(true)} className="w-full py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-500 text-sm font-medium transition-all cursor-pointer border border-zinc-200 dark:border-zinc-800 flex items-center justify-center gap-1.5">
-              <RotateCcw size={14} />
-              Mulai Ulang dari Awal
-            </button>
-          )}
+          <button onClick={handleReset} className="w-full py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-500 text-sm font-medium transition-all cursor-pointer border border-zinc-200 dark:border-zinc-800 flex items-center justify-center gap-1.5">
+            <RotateCcw size={14} />
+            Mulai Ulang dari Awal
+          </button>
 
-          {showDeleteConfirm ? (
-            <div className="flex gap-2">
-              <button onClick={() => { deleteHabit(habit.id); navigate("/"); }} className="flex-1 py-2.5 rounded-xl bg-red-50 dark:bg-red-500/20 hover:bg-red-100 dark:hover:bg-red-500/30 text-red-600 dark:text-red-400 text-sm font-semibold transition-all cursor-pointer border border-red-200 dark:border-red-500/20">
-                Ya, hapus
-              </button>
-              <button onClick={() => setShowDeleteConfirm(false)} className="flex-1 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-400 text-sm font-medium transition-all cursor-pointer border border-zinc-200 dark:border-zinc-700">
-                Batal
-              </button>
-            </div>
-          ) : (
-            <button onClick={() => setShowDeleteConfirm(true)} className="w-full py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 hover:bg-red-50 dark:hover:bg-red-500/10 text-zinc-500 dark:text-zinc-600 hover:text-red-600 dark:hover:text-red-400 text-sm font-medium transition-all cursor-pointer border border-zinc-200 dark:border-zinc-800 hover:border-red-200 dark:hover:border-red-500/20 flex items-center justify-center gap-1.5">
-              <Trash2 size={14} />
-              Hapus Kebiasaan
-            </button>
-          )}
+          <button onClick={handleDelete} className="w-full py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 hover:bg-red-50 dark:hover:bg-red-500/10 text-zinc-500 dark:text-zinc-600 hover:text-red-600 dark:hover:text-red-400 text-sm font-medium transition-all cursor-pointer border border-zinc-200 dark:border-zinc-800 hover:border-red-200 dark:hover:border-red-500/20 flex items-center justify-center gap-1.5">
+            <Trash2 size={14} />
+            Hapus Kebiasaan
+          </button>
         </div>
       </main>
     </div>

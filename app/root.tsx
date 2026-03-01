@@ -8,6 +8,7 @@ import {
 } from "react-router";
 import { ToastContainer } from "~/components/ToastContainer";
 import { DevTools } from "~/components/DevTools";
+import { ConfirmDialog } from "~/components/ConfirmDialog";
 
 import type { Route } from "./+types/root";
 import "./app.css";
@@ -69,6 +70,7 @@ export default function App() {
   return (
     <>
       <ToastContainer />
+      <ConfirmDialog />
       <DevTools />
       <Outlet />
     </>

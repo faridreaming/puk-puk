@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link } from "react-router";
 import type { Habit } from "~/store/useHabitStore";
 import { useHabitStore, getStreak } from "~/store/useHabitStore";
@@ -6,6 +5,7 @@ import { useToastStore } from "~/store/useToastStore";
 import { LivesIndicator } from "./LivesIndicator";
 import { Check, X, Undo2, Flame, ChevronRight, Trophy } from "lucide-react";
 import { useToday } from "~/store/useDevStore";
+import { useDialogStore } from "~/store/useDialogStore";
 
 interface HabitCardProps {
   habit: Habit;
@@ -16,7 +16,7 @@ export function HabitCard({ habit }: HabitCardProps) {
   const markMissed = useHabitStore((s) => s.markMissed);
   const undoToday = useHabitStore((s) => s.undoToday);
   const addToast = useToastStore((s) => s.addToast);
-  const [showMissedConfirm, setShowMissedConfirm] = useState(false);
+  const openDialog = useDialogStore((s) => s.openDialog);
 
   const today = useToday();
   const alreadyTrackedToday =
@@ -39,35 +39,50 @@ export function HabitCard({ habit }: HabitCardProps) {
 
   const handleComplete = (e: React.MouseEvent) => {
     e.preventDefault();
-    const result = markComplete(habit.id, today);
-    if (result.type === "complete") {
-      if (result.stageUp) {
-        addToast({ message: "Naik tahap! Lanjutkan, kamu hebat!", type: "celebration", duration: 4000 });
-      } else {
-        const messages = [
-          "Mantap! Satu langkah lebih dekat!",
-          "Kerja bagus! Teruskan!",
-          "Konsisten itu kunci!",
-          "Hari ini berhasil!",
-        ];
-        addToast({ message: messages[Math.floor(Math.random() * messages.length)], type: "success" });
-      }
-    }
+    openDialog({
+      title: "Tandai selesai?",
+      message: `Tandai "${habit.name}" sebagai selesai untuk hari ini.`,
+      confirmLabel: "Ya, selesai",
+      variant: "info",
+      onConfirm: () => {
+        const result = markComplete(habit.id, today);
+        if (result.type === "complete") {
+          if (result.stageUp) {
+            addToast({ message: "Naik tahap! Lanjutkan, kamu hebat!", type: "celebration", duration: 4000 });
+          } else {
+            const messages = [
+              "Mantap! Satu langkah lebih dekat!",
+              "Kerja bagus! Teruskan!",
+              "Konsisten itu kunci!",
+              "Hari ini berhasil!",
+            ];
+            addToast({ message: messages[Math.floor(Math.random() * messages.length)], type: "success" });
+          }
+        }
+      },
+    });
   };
 
   const handleMissed = (e: React.MouseEvent) => {
     e.preventDefault();
-    const result = markMissed(habit.id, today);
-    setShowMissedConfirm(false);
-    if (result.type === "missed") {
-      if (result.stageDown) {
-        addToast({ message: "Turun tahap. Tidak apa-apa, mulai lagi perlahan.", type: "warning", duration: 4000 });
-      } else if (result.livesLeft === 1) {
-        addToast({ message: "Nyawa tersisa 1. Hati-hati, kamu bisa!", type: "warning" });
-      } else {
-        addToast({ message: "Terlewat hari ini. Besok coba lagi!", type: "info" });
-      }
-    }
+    openDialog({
+      title: "Tandai terlewat?",
+      message: "Hari ini akan ditandai sebagai terlewat. Nyawa akan berkurang.",
+      confirmLabel: "Ya, terlewat",
+      variant: "warning",
+      onConfirm: () => {
+        const result = markMissed(habit.id, today);
+        if (result.type === "missed") {
+          if (result.stageDown) {
+            addToast({ message: "Turun tahap. Tidak apa-apa, mulai lagi perlahan.", type: "warning", duration: 4000 });
+          } else if (result.livesLeft === 1) {
+            addToast({ message: "Nyawa tersisa 1. Hati-hati, kamu bisa!", type: "warning" });
+          } else {
+            addToast({ message: "Terlewat hari ini. Besok coba lagi!", type: "info" });
+          }
+        }
+      },
+    });
   };
 
   const handleUndo = (e: React.MouseEvent) => {
@@ -163,24 +178,6 @@ export function HabitCard({ habit }: HabitCardProps) {
                   <Undo2 size={14} />
                 </button>
               </div>
-            ) : showMissedConfirm ? (
-              <>
-                <button
-                  onClick={handleMissed}
-                  className="flex-1 py-2 rounded-xl bg-red-50 dark:bg-red-500/15 hover:bg-red-100 dark:hover:bg-red-500/25 text-red-600 dark:text-red-400 font-semibold text-sm transition-all active:scale-95 cursor-pointer border border-red-200/60 dark:border-red-500/15"
-                >
-                  Ya, terlewat
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setShowMissedConfirm(false);
-                  }}
-                  className="py-2 px-4 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-500 dark:text-zinc-400 font-medium text-sm transition-all active:scale-95 cursor-pointer border border-zinc-200/60 dark:border-zinc-700/40"
-                >
-                  Batal
-                </button>
-              </>
             ) : (
               <>
                 <button
@@ -191,10 +188,7 @@ export function HabitCard({ habit }: HabitCardProps) {
                   Selesai
                 </button>
                 <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setShowMissedConfirm(true);
-                  }}
+                  onClick={handleMissed}
                   className="py-2.5 px-4 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-500 dark:text-zinc-400 font-medium text-sm transition-all duration-200 active:scale-95 cursor-pointer border border-zinc-200/60 dark:border-zinc-700/40"
                 >
                   Terlewat

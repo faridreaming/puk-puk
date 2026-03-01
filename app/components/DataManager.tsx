@@ -1,10 +1,12 @@
 import { useRef } from "react";
 import { useHabitStore } from "~/store/useHabitStore";
+import { useToastStore } from "~/store/useToastStore";
 import { Download, Upload } from "lucide-react";
 
 export function DataManager() {
   const exportData = useHabitStore((s) => s.exportData);
   const importData = useHabitStore((s) => s.importData);
+  const addToast = useToastStore((s) => s.addToast);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleExport = () => {
@@ -29,9 +31,9 @@ export function DataManager() {
       const json = event.target?.result as string;
       const success = importData(json);
       if (success) {
-        alert("Data berhasil diimpor!");
+        addToast({ message: "Data berhasil diimpor!", type: "success" });
       } else {
-        alert("Gagal mengimpor data. Format file tidak valid.");
+        addToast({ message: "Gagal mengimpor data. Format file tidak valid.", type: "warning" });
       }
     };
     reader.readAsText(file);
