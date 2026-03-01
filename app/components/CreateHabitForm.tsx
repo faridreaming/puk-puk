@@ -233,7 +233,7 @@ export function CreateHabitForm() {
         )}
         {parsed && (
           <p className="text-xs text-emerald-600 dark:text-emerald-500 mt-2 flex items-center gap-1">
-            <Check size={12} className="shrink-0" /> Terdeteksi: <span className="font-semibold">{parsed.activity}</span> · target <span className="font-semibold">{parsed.targetNumber} {parsed.unit}</span>
+            <Check size={12} className="shrink-0" /> Terdeteksi: <span className="font-semibold">{parsed.activity}</span> dengan target <span className="font-semibold">{parsed.targetNumber} {parsed.unit}</span>
           </p>
         )}
       </div>
@@ -243,21 +243,30 @@ export function CreateHabitForm() {
         <label className="block text-sm font-semibold text-zinc-500 dark:text-zinc-400 mb-2">
           Jumlah Nyawa
         </label>
-        <div className="flex gap-2">
-          {[2, 3, 4, 5].map((n) => (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          {[
+            { value: 2, label: "Hardcore" },
+            { value: 3, label: "Standar" },
+            { value: 4, label: "Santai" },
+            { value: 5, label: "Paling Santai" }
+          ].map(({ value, label }) => (
             <button
-              key={n}
+              key={value}
               type="button"
-              onClick={() => setMaxLives(n)}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer flex items-center gap-0.5 ${maxLives === n
-                ? "bg-red-100 dark:bg-red-500/20 text-red-500 dark:text-red-400 ring-2 ring-red-500/50"
-                : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:bg-zinc-200 dark:hover:bg-zinc-700"
+              onClick={() => setMaxLives(value)}
+              className={`p-3 rounded-xl transition-all duration-200 cursor-pointer flex flex-col items-center gap-1.5 ${maxLives === value
+                ? "bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 ring-2 ring-red-500/50"
+                : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700"
                 }`}
             >
-              {Array.from({ length: n }, (_, i) => <Heart key={i} size={14} className="fill-current" />)}
+              <div className="flex gap-0.5">
+                {Array.from({ length: value }, (_, i) => <Heart key={i} size={14} className="fill-current" />)}
+              </div>
+              <span className="text-xs font-semibold">{label}</span>
             </button>
           ))}
         </div>
+        <p className="text-[11px] text-zinc-500 mt-2">Nyawa berkurang saat kamu terlewat satu hari. Jika habis, kamu akan <strong>turun ke tahap sebelumnya</strong> untuk mengumpulkan niat lagi perlahan.</p>
       </div>
 
       {/* Stages — visual roadmap */}
@@ -269,7 +278,7 @@ export function CreateHabitForm() {
                 Peta Perjalananmu
               </label>
               {!manualStages && (
-                <span className="text-[10px] text-zinc-600">otomatis dari targetmu — bisa diedit</span>
+                <span className="text-[10px] text-zinc-600">Otomatis dari targetmu (bisa diedit)</span>
               )}
             </div>
             <button
