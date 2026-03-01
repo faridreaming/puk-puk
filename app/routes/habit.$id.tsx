@@ -148,7 +148,7 @@ export default function HabitDetail({ params }: Route.ComponentProps) {
     setIsEditing(false);
   };
 
-  const EMOJI_OPTIONS = ["🧘", "🏃", "📚", "💪", "🎯", "✍️", "🎵", "🥗", "💤", "🧹", "💻", "🚫"];
+  const EMOJI_OPTIONS = ["🧘", "🏃", "📚", "💪", "🎯", "✍️", "🥗", "💤", "🧹", "💻", "🚫"];
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-zinc-950 transition-colors">

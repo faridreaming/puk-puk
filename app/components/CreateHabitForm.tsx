@@ -17,7 +17,7 @@ const TEMPLATES = [
   { text: "Menulis 500 kata", icon: "✍️" },
 ];
 
-const EMOJI_OPTIONS = ["🧘", "🏃", "📚", "💪", "🎯", "✍️", "🎵", "🥗", "💤", "🧹", "💻", "🚫"];
+const EMOJI_OPTIONS = ["🧘", "🏃", "📚", "💪", "🎯", "✍️", "🥗", "💤", "🧹", "💻", "🚫"];
 
 // Regex: extract activity name, target number, and unit
 // e.g. "Meditasi 30 menit" → ["Meditasi", "30", "menit"]
@@ -155,10 +155,10 @@ export function CreateHabitForm() {
               key={t.text}
               type="button"
               onClick={() => applyTemplate(t)}
-              className="p-3 rounded-xl bg-zinc-100 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/50 hover:border-zinc-300 dark:hover:border-zinc-600 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all duration-200 text-center cursor-pointer"
+              className="p-3 rounded-xl bg-zinc-100 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/50 hover:border-zinc-300 dark:hover:border-zinc-600 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all duration-200 text-center cursor-pointer flex flex-col items-center justify-center gap-2"
             >
-              <span className="text-2xl block mb-1">{t.icon}</span>
-              <span className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-tight">{t.text}</span>
+              <span className="text-2xl leading-none">{t.icon}</span>
+              <span className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-tight text-center">{t.text}</span>
             </button>
           ))}
         </div>
