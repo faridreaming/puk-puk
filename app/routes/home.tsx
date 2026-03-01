@@ -9,7 +9,7 @@ import { Plus } from "lucide-react";
 
 export function meta({ }: Route.MetaArgs) {
   return [
-    { title: "Puk-Puk 🐣 Bangun Kebiasaan Perlahan" },
+    { title: "Puk-Puk - Bangun Kebiasaan Perlahan" },
     { name: "description", content: "Aplikasi habit tracker yang mendukung perubahan bertahap" },
   ];
 }

@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router";
 import { useHabitStore } from "~/store/useHabitStore";
-import { Lightbulb, Check, Flag, Rocket, Heart, Plus, X } from "lucide-react";
+import { Lightbulb, Check, Flag, Rocket, Heart, Plus, X, CopyPlus, Info, Trash2, Settings2, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
 
 interface StageInput {
   label: string;
@@ -71,6 +71,7 @@ export function CreateHabitForm() {
   const [icon, setIcon] = useState("🎯");
   const [maxLives, setMaxLives] = useState(3);
   const [manualStages, setManualStages] = useState<StageInput[] | null>(null);
+  const [showTemplates, setShowTemplates] = useState(false);
 
   // Parse input with regex
   const parsed = useMemo(() => {
@@ -144,23 +145,45 @@ export function CreateHabitForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Templates */}
+      {/* Templates Accordion */}
       <div>
-        <label className="block text-sm font-semibold text-zinc-500 dark:text-zinc-400 mb-3">
-          Template Cepat
-        </label>
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-          {TEMPLATES.map((t) => (
-            <button
-              key={t.text}
-              type="button"
-              onClick={() => applyTemplate(t)}
-              className="p-3 rounded-xl bg-zinc-100 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/50 hover:border-zinc-300 dark:hover:border-zinc-600 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all duration-200 text-center cursor-pointer flex flex-col items-center justify-center gap-2"
-            >
-              <span className="text-2xl leading-none">{t.icon}</span>
-              <span className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-tight text-center">{t.text}</span>
-            </button>
-          ))}
+        <button
+          type="button"
+          onClick={() => setShowTemplates(!showTemplates)}
+          className="flex items-center justify-between w-full group mb-3 cursor-pointer"
+        >
+          <label className="text-sm font-semibold text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-700 dark:group-hover:text-zinc-300 transition-colors cursor-pointer pointer-events-none">
+            Template Cepat
+          </label>
+          <div className="w-6 h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-all">
+            {showTemplates ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+          </div>
+        </button>
+
+        <div
+          className={`grid transition-all duration-300 ease-in-out ${showTemplates ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+            }`}
+        >
+          <div className="overflow-hidden">
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 pt-1 pb-2">
+              {TEMPLATES.map((t) => (
+                <button
+                  key={t.text}
+                  type="button"
+                  onClick={() => {
+                    applyTemplate(t);
+                    setShowTemplates(false);
+                  }}
+                  // Prevent tabbing to hidden elements
+                  tabIndex={showTemplates ? 0 : -1}
+                  className="p-3 rounded-xl bg-zinc-100 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/50 hover:border-zinc-300 dark:hover:border-zinc-600 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all duration-200 text-center cursor-pointer flex flex-col items-center justify-center gap-2"
+                >
+                  <span className="text-2xl leading-none">{t.icon}</span>
+                  <span className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-tight text-center">{t.text}</span>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
