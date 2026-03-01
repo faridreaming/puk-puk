@@ -67,7 +67,7 @@ export function getStreak(completedDates: string[], missedDates: string[]): numb
   }
 
   while (true) {
-    const dateStr = checkDate.toISOString().split("T")[0];
+    const dateStr = `${checkDate.getFullYear()}-${String(checkDate.getMonth() + 1).padStart(2, "0")}-${String(checkDate.getDate()).padStart(2, "0")}`;
     if (sorted.includes(dateStr)) {
       streak++;
       checkDate.setDate(checkDate.getDate() - 1);

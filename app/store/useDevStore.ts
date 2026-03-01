@@ -6,6 +6,14 @@ interface DevStore {
   jumpDays: (days: number) => void;
 }
 
+/** Format a Date to YYYY-MM-DD using LOCAL time (avoids UTC shift from toISOString) */
+function formatLocalDate(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
 export const useDevStore = create<DevStore>((set, get) => ({
   dateOverride: null,
 
@@ -13,10 +21,10 @@ export const useDevStore = create<DevStore>((set, get) => ({
 
   jumpDays: (days) => {
     const current = get().dateOverride
-      ? new Date(get().dateOverride!)
+      ? new Date(get().dateOverride + "T00:00:00")
       : new Date();
     current.setDate(current.getDate() + days);
-    set({ dateOverride: current.toISOString().split("T")[0] });
+    set({ dateOverride: formatLocalDate(current) });
   },
 }));
 
@@ -29,7 +37,7 @@ export function getToday(): string {
     const override = useDevStore.getState().dateOverride;
     if (override) return override;
   }
-  return new Date().toISOString().split("T")[0];
+  return formatLocalDate(new Date());
 }
 
 /**
@@ -40,8 +48,7 @@ export function getTodayDate(): Date {
   if (import.meta.env.DEV) {
     const override = useDevStore.getState().dateOverride;
     if (override) {
-      const d = new Date(override);
-      d.setHours(0, 0, 0, 0);
+      const d = new Date(override + "T00:00:00");
       return d;
     }
   }
@@ -54,7 +61,7 @@ export function getTodayDate(): Date {
 export function useToday(): string {
   const override = useDevStore((s) => s.dateOverride);
   if (import.meta.env.DEV && override) return override;
-  return new Date().toISOString().split("T")[0];
+  return formatLocalDate(new Date());
 }
 
 /**
@@ -63,9 +70,7 @@ export function useToday(): string {
 export function useTodayDate(): Date {
   const override = useDevStore((s) => s.dateOverride);
   if (import.meta.env.DEV && override) {
-    const d = new Date(override);
-    d.setHours(0, 0, 0, 0);
-    return d;
+    return new Date(override + "T00:00:00");
   }
   return new Date();
 }

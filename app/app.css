@@ -27,19 +27,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Heartbeat animation */
-@keyframes heartbeat {
-
-  0%,
-  100% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.15);
-  }
-}
-
 /* Toast animations */
 @keyframes toastEnter {
   from {

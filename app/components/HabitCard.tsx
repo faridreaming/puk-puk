@@ -132,7 +132,7 @@ export function HabitCard({ habit }: HabitCardProps) {
         {/* Weekly Tracker */}
         {!isComplete && (
           <div className="mb-4">
-            <WeeklyTracker completedDates={habit.completedDates} missedDates={habit.missedDates} />
+            <WeeklyTracker habitId={habit.id} completedDates={habit.completedDates} missedDates={habit.missedDates} />
           </div>
         )}
 
@@ -155,13 +155,14 @@ export function HabitCard({ habit }: HabitCardProps) {
                   className="flex-1 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-semibold text-sm transition-all duration-200 active:scale-95 cursor-pointer shadow-md shadow-emerald-500/20 flex items-center justify-center gap-1.5"
                 >
                   <Check size={16} strokeWidth={2.5} />
-                  Selesai
+                  Tandai Selesai
                 </button>
                 <button
                   onClick={handleMissed}
-                  className="py-2.5 px-4 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-500 dark:text-zinc-400 font-medium text-sm transition-all duration-200 active:scale-95 cursor-pointer border border-zinc-200/60 dark:border-zinc-700/40"
+                  className="flex-1 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-500 dark:text-zinc-400 font-medium text-sm transition-all duration-200 active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 box-content"
                 >
-                  Terlewat
+                  <X size={16} strokeWidth={2.5} />
+                  Tandai Terlewat
                 </button>
               </>
             )}

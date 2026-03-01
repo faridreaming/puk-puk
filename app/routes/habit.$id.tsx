@@ -304,7 +304,7 @@ export default function HabitDetail({ params }: Route.ComponentProps) {
 
             {/* Weekly Tracker */}
             <div className="bg-white dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 transition-colors">
-              <WeeklyTracker completedDates={habit.completedDates} missedDates={habit.missedDates} />
+              <WeeklyTracker habitId={habit.id} completedDates={habit.completedDates} missedDates={habit.missedDates} />
             </div>
           </div>
         </div>

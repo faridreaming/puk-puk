@@ -12,11 +12,10 @@ export function LivesIndicator({ lives, maxLives }: LivesIndicatorProps) {
         <Heart
           key={i}
           size={14}
-          className={`transition-all duration-300 ${i < lives
-              ? "text-red-500 fill-red-500 animate-[heartbeat_2s_ease-in-out_infinite]"
-              : "text-zinc-400 dark:text-zinc-700"
+          className={`transition-colors duration-300 ${i < lives
+            ? "text-red-500 fill-red-500"
+            : "text-zinc-400 dark:text-zinc-700"
             }`}
-          style={i < lives ? { animationDelay: `${i * 0.15}s` } : undefined}
         />
       ))}
     </div>
