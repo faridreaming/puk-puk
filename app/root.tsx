@@ -7,6 +7,7 @@ import {
   ScrollRestoration,
 } from "react-router";
 import { ToastContainer } from "~/components/ToastContainer";
+import { DevTools } from "~/components/DevTools";
 
 import type { Route } from "./+types/root";
 import "./app.css";
@@ -26,12 +27,34 @@ export const links: Route.LinksFunction = () => [
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id">
+    <html lang="id" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var stored = localStorage.getItem('pukpuk-theme');
+                  var theme = 'dark';
+                  if (stored) {
+                    var parsed = JSON.parse(stored);
+                    theme = parsed.state && parsed.state.theme || 'dark';
+                  }
+                  if (theme === 'system') {
+                    theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                  }
+                  document.documentElement.classList.add(theme);
+                } catch(e) {
+                  document.documentElement.classList.add('dark');
+                }
+              })();
+            `,
+          }}
+        />
       </head>
       <body>
         {children}
@@ -46,6 +69,7 @@ export default function App() {
   return (
     <>
       <ToastContainer />
+      <DevTools />
       <Outlet />
     </>
   );

@@ -7,6 +7,7 @@ import { LivesIndicator } from "~/components/LivesIndicator";
 import type { Route } from "./+types/habit.$id";
 import { useState } from "react";
 import { ChevronLeft, Pencil, Check, X, Undo2, Flame, RotateCcw, Trash2, Search } from "lucide-react";
+import { useToday } from "~/store/useDevStore";
 
 export function meta({ params }: Route.MetaArgs) {
   return [
@@ -47,7 +48,7 @@ export default function HabitDetail({ params }: Route.ComponentProps) {
     );
   }
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = useToday();
   const alreadyTrackedToday =
     habit.completedDates.includes(today) || habit.missedDates.includes(today);
   const completedToday = habit.completedDates.includes(today);
@@ -148,8 +149,8 @@ export default function HabitDetail({ params }: Route.ComponentProps) {
                   type="button"
                   onClick={() => setEditIcon(emoji)}
                   className={`w-9 h-9 rounded-lg text-lg flex items-center justify-center transition-all cursor-pointer ${editIcon === emoji
-                      ? "bg-amber-100 dark:bg-amber-500/20 ring-2 ring-amber-500 scale-110"
-                      : "bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700"
+                    ? "bg-amber-100 dark:bg-amber-500/20 ring-2 ring-amber-500 scale-110"
+                    : "bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700"
                     }`}
                 >
                   {emoji}
@@ -225,8 +226,8 @@ export default function HabitDetail({ params }: Route.ComponentProps) {
                   <div className="flex items-center gap-2">
                     <div
                       className={`flex-1 py-3 rounded-xl text-center text-sm font-semibold flex items-center justify-center gap-1.5 ${completedToday
-                          ? "bg-emerald-50 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20"
-                          : "bg-red-50 dark:bg-red-500/15 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-500/20"
+                        ? "bg-emerald-50 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20"
+                        : "bg-red-50 dark:bg-red-500/15 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-500/20"
                         }`}
                     >
                       {completedToday ? <><Check size={16} /> Sudah selesai hari ini</> : <><X size={16} /> Terlewat hari ini</>}

@@ -1,12 +1,12 @@
 import { Check, X } from "lucide-react";
+import { useToday, useTodayDate } from "~/store/useDevStore";
 
 interface WeeklyTrackerProps {
   completedDates: string[];
   missedDates: string[];
 }
 
-function getWeekDates(): { date: string; dayLabel: string; isToday: boolean }[] {
-  const today = new Date();
+function getWeekDates(today: Date, todayStr: string): { date: string; dayLabel: string; isToday: boolean }[] {
   const dayOfWeek = today.getDay(); // 0=Sun
   const monday = new Date(today);
   monday.setDate(today.getDate() - ((dayOfWeek + 6) % 7));
@@ -20,13 +20,15 @@ function getWeekDates(): { date: string; dayLabel: string; isToday: boolean }[] 
     return {
       date: dateStr,
       dayLabel: days[i],
-      isToday: dateStr === today.toISOString().split("T")[0],
+      isToday: dateStr === todayStr,
     };
   });
 }
 
 export function WeeklyTracker({ completedDates, missedDates }: WeeklyTrackerProps) {
-  const weekDates = getWeekDates();
+  const todayStr = useToday();
+  const todayDate = useTodayDate();
+  const weekDates = getWeekDates(todayDate, todayStr);
 
   return (
     <div className="w-full">
@@ -37,7 +39,7 @@ export function WeeklyTracker({ completedDates, missedDates }: WeeklyTrackerProp
         {weekDates.map(({ date, dayLabel, isToday }) => {
           const isCompleted = completedDates.includes(date);
           const isMissed = missedDates.includes(date);
-          const isFuture = new Date(date) > new Date();
+          const isFuture = new Date(date) > todayDate;
 
           return (
             <div key={date} className="flex flex-col items-center gap-1">

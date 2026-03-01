@@ -22,6 +22,7 @@ export const useThemeStore = create<ThemeStore>()(
       getResolvedTheme: () => {
         const { theme } = get();
         if (theme === "system") {
+          if (typeof window === "undefined") return "dark";
           return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
         }
         return theme;
@@ -32,6 +33,7 @@ export const useThemeStore = create<ThemeStore>()(
 );
 
 export function applyTheme(theme: Theme) {
+  if (typeof document === "undefined") return;
   const root = document.documentElement;
   if (theme === "system") {
     const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -40,20 +42,5 @@ export function applyTheme(theme: Theme) {
   } else {
     root.classList.toggle("dark", theme === "dark");
     root.classList.toggle("light", theme === "light");
-  }
-}
-
-// Initialize on load
-if (typeof window !== "undefined") {
-  const stored = localStorage.getItem("pukpuk-theme");
-  if (stored) {
-    try {
-      const { state } = JSON.parse(stored);
-      applyTheme(state?.theme ?? "dark");
-    } catch {
-      applyTheme("dark");
-    }
-  } else {
-    applyTheme("dark");
   }
 }

@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { getToday, getTodayDate } from "~/store/useDevStore";
 
 // --- Types ---
 
@@ -53,14 +54,14 @@ export function getStreak(completedDates: string[], missedDates: string[]): numb
   if (completedDates.length === 0) return 0;
 
   const sorted = [...completedDates].sort().reverse();
-  const today = new Date();
+  const today = getTodayDate();
   today.setHours(0, 0, 0, 0);
 
   let streak = 0;
   let checkDate = new Date(today);
 
   // If today isn't tracked yet, start checking from yesterday
-  const todayStr = today.toISOString().split("T")[0];
+  const todayStr = getToday();
   if (!sorted.includes(todayStr)) {
     checkDate.setDate(checkDate.getDate() - 1);
   }

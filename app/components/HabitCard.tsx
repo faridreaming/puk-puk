@@ -5,6 +5,7 @@ import { useHabitStore, getStreak } from "~/store/useHabitStore";
 import { useToastStore } from "~/store/useToastStore";
 import { LivesIndicator } from "./LivesIndicator";
 import { Check, X, Undo2, Flame } from "lucide-react";
+import { useToday } from "~/store/useDevStore";
 
 interface HabitCardProps {
   habit: Habit;
@@ -17,7 +18,7 @@ export function HabitCard({ habit }: HabitCardProps) {
   const addToast = useToastStore((s) => s.addToast);
   const [showMissedConfirm, setShowMissedConfirm] = useState(false);
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = useToday();
   const alreadyTrackedToday =
     habit.completedDates.includes(today) || habit.missedDates.includes(today);
   const completedToday = habit.completedDates.includes(today);
@@ -133,8 +134,8 @@ export function HabitCard({ habit }: HabitCardProps) {
             <div className="flex-1 flex items-center gap-2">
               <div
                 className={`flex-1 py-2.5 rounded-xl text-center text-sm font-semibold flex items-center justify-center gap-1.5 ${completedToday
-                    ? "bg-emerald-50 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20"
-                    : "bg-red-50 dark:bg-red-500/15 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-500/20"
+                  ? "bg-emerald-50 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20"
+                  : "bg-red-50 dark:bg-red-500/15 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-500/20"
                   }`}
               >
                 {completedToday ? <><Check size={14} /> Selesai hari ini</> : <><X size={14} /> Terlewat hari ini</>}
