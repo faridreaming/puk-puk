@@ -1,3 +1,5 @@
+import { Check, X } from "lucide-react";
+
 interface WeeklyTrackerProps {
   completedDates: string[];
   missedDates: string[];
@@ -7,7 +9,7 @@ function getWeekDates(): { date: string; dayLabel: string; isToday: boolean }[] 
   const today = new Date();
   const dayOfWeek = today.getDay(); // 0=Sun
   const monday = new Date(today);
-  monday.setDate(today.getDate() - ((dayOfWeek + 6) % 7)); // Get Monday
+  monday.setDate(today.getDate() - ((dayOfWeek + 6) % 7));
 
   const days = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
 
@@ -39,7 +41,7 @@ export function WeeklyTracker({ completedDates, missedDates }: WeeklyTrackerProp
 
           return (
             <div key={date} className="flex flex-col items-center gap-1">
-              <span className={`text-[10px] font-medium ${isToday ? "text-amber-400" : "text-zinc-600"}`}>
+              <span className={`text-[10px] font-medium ${isToday ? "text-amber-500 dark:text-amber-400" : "text-zinc-400 dark:text-zinc-600"}`}>
                 {dayLabel}
               </span>
               <div
@@ -47,18 +49,18 @@ export function WeeklyTracker({ completedDates, missedDates }: WeeklyTrackerProp
                   w-9 h-9 rounded-lg flex items-center justify-center text-sm font-semibold
                   transition-all duration-300
                   ${isCompleted
-                    ? "bg-emerald-500/20 text-emerald-400 ring-1 ring-emerald-500/30"
+                    ? "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-300 dark:ring-emerald-500/30"
                     : isMissed
-                      ? "bg-red-500/20 text-red-400 ring-1 ring-red-500/30"
+                      ? "bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 ring-1 ring-red-300 dark:ring-red-500/30"
                       : isToday
-                        ? "bg-amber-500/20 text-amber-400 ring-2 ring-amber-500/40"
+                        ? "bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 ring-2 ring-amber-300 dark:ring-amber-500/40"
                         : isFuture
-                          ? "bg-zinc-800/50 text-zinc-700"
-                          : "bg-zinc-800/50 text-zinc-600"
+                          ? "bg-zinc-100 dark:bg-zinc-800/50 text-zinc-400 dark:text-zinc-700"
+                          : "bg-zinc-100 dark:bg-zinc-800/50 text-zinc-400 dark:text-zinc-600"
                   }
                 `}
               >
-                {isCompleted ? "✓" : isMissed ? "✗" : new Date(date).getDate()}
+                {isCompleted ? <Check size={16} strokeWidth={2.5} /> : isMissed ? <X size={16} strokeWidth={2.5} /> : new Date(date).getDate()}
               </div>
             </div>
           );

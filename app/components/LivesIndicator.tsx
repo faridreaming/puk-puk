@@ -1,3 +1,5 @@
+import { Heart } from "lucide-react";
+
 interface LivesIndicatorProps {
   lives: number;
   maxLives: number;
@@ -5,20 +7,17 @@ interface LivesIndicatorProps {
 
 export function LivesIndicator({ lives, maxLives }: LivesIndicatorProps) {
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-0.5">
       {Array.from({ length: maxLives }, (_, i) => (
-        <span
+        <Heart
           key={i}
-          className={`text-lg transition-all duration-300 ${i < lives
-              ? "scale-100 animate-[heartbeat_1.5s_ease-in-out_infinite]"
-              : "scale-90 opacity-40 grayscale"
+          size={14}
+          className={`transition-all duration-300 ${i < lives
+              ? "text-red-500 fill-red-500 animate-[heartbeat_2s_ease-in-out_infinite]"
+              : "text-zinc-400 dark:text-zinc-700"
             }`}
-          style={{
-            animationDelay: `${i * 0.2}s`,
-          }}
-        >
-          {i < lives ? "❤️" : "🖤"}
-        </span>
+          style={i < lives ? { animationDelay: `${i * 0.15}s` } : undefined}
+        />
       ))}
     </div>
   );

@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router";
 import { useHabitStore } from "~/store/useHabitStore";
+import { Lightbulb, Check, Flag, Rocket, Heart, Plus, X } from "lucide-react";
 
 interface StageInput {
   label: string;
@@ -145,19 +146,19 @@ export function CreateHabitForm() {
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Templates */}
       <div>
-        <label className="block text-sm font-semibold text-zinc-400 mb-3">
+        <label className="block text-sm font-semibold text-zinc-500 dark:text-zinc-400 mb-3">
           Template Cepat
         </label>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
           {TEMPLATES.map((t) => (
             <button
               key={t.text}
               type="button"
               onClick={() => applyTemplate(t)}
-              className="p-3 rounded-xl bg-zinc-800/50 border border-zinc-700/50 hover:border-zinc-600 hover:bg-zinc-800 transition-all duration-200 text-center cursor-pointer"
+              className="p-3 rounded-xl bg-zinc-100 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/50 hover:border-zinc-300 dark:hover:border-zinc-600 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all duration-200 text-center cursor-pointer"
             >
               <span className="text-2xl block mb-1">{t.icon}</span>
-              <span className="text-[11px] text-zinc-400 leading-tight">{t.text}</span>
+              <span className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-tight">{t.text}</span>
             </button>
           ))}
         </div>
@@ -165,7 +166,7 @@ export function CreateHabitForm() {
 
       {/* Emoji picker */}
       <div>
-        <label className="block text-sm font-semibold text-zinc-400 mb-2">
+        <label className="block text-sm font-semibold text-zinc-500 dark:text-zinc-400 mb-2">
           Ikon
         </label>
         <div className="flex flex-wrap gap-2">
@@ -175,8 +176,8 @@ export function CreateHabitForm() {
               type="button"
               onClick={() => setIcon(emoji)}
               className={`w-10 h-10 rounded-lg text-xl flex items-center justify-center transition-all duration-200 cursor-pointer ${icon === emoji
-                ? "bg-amber-500/20 ring-2 ring-amber-500 scale-110"
-                : "bg-zinc-800 hover:bg-zinc-700"
+                ? "bg-amber-100 dark:bg-amber-500/20 ring-2 ring-amber-500 scale-110"
+                : "bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700"
                 }`}
             >
               {emoji}
@@ -187,7 +188,7 @@ export function CreateHabitForm() {
 
       {/* Single input: Target Kebiasaan */}
       <div>
-        <label htmlFor="habit-input" className="block text-sm font-semibold text-zinc-400 mb-2">
+        <label htmlFor="habit-input" className="block text-sm font-semibold text-zinc-500 dark:text-zinc-400 mb-2">
           Target Kebiasaan
         </label>
         <input
@@ -196,27 +197,27 @@ export function CreateHabitForm() {
           value={input}
           onChange={(e) => {
             setInput(e.target.value);
-            setManualStages(null); // Reset to auto when input changes
+            setManualStages(null);
           }}
           placeholder='Contoh: "Meditasi 30 menit", "Push-up 50 kali"'
-          className="w-full px-4 py-3 bg-zinc-800/50 border border-zinc-700 rounded-xl text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 transition-all text-lg"
+          className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 transition-all text-lg"
         />
         {input.trim() && !parsed && (
-          <p className="text-xs text-zinc-600 mt-2 flex items-center gap-1">
-            <span className="text-amber-500">💡</span>
-            Tulis dengan format: <span className="text-zinc-400 font-mono">[kebiasaan] [angka] [satuan]</span>
+          <p className="text-xs text-zinc-500 dark:text-zinc-600 mt-2 flex items-center gap-1">
+            <Lightbulb size={12} className="text-amber-500 shrink-0" />
+            Tulis dengan format: <span className="text-zinc-600 dark:text-zinc-400 font-mono">[kebiasaan] [angka] [satuan]</span>
           </p>
         )}
         {parsed && (
-          <p className="text-xs text-emerald-500 mt-2 flex items-center gap-1">
-            ✓ Terdeteksi: <span className="font-semibold">{parsed.activity}</span> — target <span className="font-semibold">{parsed.targetNumber} {parsed.unit}</span>
+          <p className="text-xs text-emerald-600 dark:text-emerald-500 mt-2 flex items-center gap-1">
+            <Check size={12} className="shrink-0" /> Terdeteksi: <span className="font-semibold">{parsed.activity}</span> · target <span className="font-semibold">{parsed.targetNumber} {parsed.unit}</span>
           </p>
         )}
       </div>
 
       {/* Lives */}
       <div>
-        <label className="block text-sm font-semibold text-zinc-400 mb-2">
+        <label className="block text-sm font-semibold text-zinc-500 dark:text-zinc-400 mb-2">
           Jumlah Nyawa
         </label>
         <div className="flex gap-2">
@@ -225,12 +226,12 @@ export function CreateHabitForm() {
               key={n}
               type="button"
               onClick={() => setMaxLives(n)}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer ${maxLives === n
-                ? "bg-red-500/20 text-red-400 ring-2 ring-red-500/50"
-                : "bg-zinc-800 text-zinc-500 hover:bg-zinc-700"
+              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer flex items-center gap-0.5 ${maxLives === n
+                ? "bg-red-100 dark:bg-red-500/20 text-red-500 dark:text-red-400 ring-2 ring-red-500/50"
+                : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:bg-zinc-200 dark:hover:bg-zinc-700"
                 }`}
             >
-              {"❤️".repeat(n)}
+              {Array.from({ length: n }, (_, i) => <Heart key={i} size={14} className="fill-current" />)}
             </button>
           ))}
         </div>
@@ -241,7 +242,7 @@ export function CreateHabitForm() {
         <div>
           <div className="flex items-center justify-between mb-4">
             <div>
-              <label className="block text-sm font-semibold text-zinc-400">
+              <label className="block text-sm font-semibold text-zinc-500 dark:text-zinc-400">
                 Peta Perjalananmu
               </label>
               {!manualStages && (
@@ -251,13 +252,13 @@ export function CreateHabitForm() {
             <button
               type="button"
               onClick={addStage}
-              className="text-xs px-3 py-1.5 rounded-lg bg-amber-500/15 text-amber-400 hover:bg-amber-500/25 transition-all cursor-pointer font-semibold"
+              className="text-xs px-3 py-1.5 rounded-lg bg-amber-500/15 text-amber-400 hover:bg-amber-500/25 transition-all cursor-pointer font-semibold flex items-center gap-1"
             >
-              + Tahap
+              <Plus size={12} /> Tahap
             </button>
           </div>
 
-          <div className="relative bg-zinc-900/60 border border-zinc-800 rounded-2xl p-4 pt-5">
+          <div className="relative bg-zinc-100 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 pt-5 transition-colors">
             <div className="relative space-y-1">
               {/* Vertical connector line */}
               <div
@@ -286,7 +287,7 @@ export function CreateHabitForm() {
                           boxShadow: `0 0 10px hsla(${hue}, 80%, 55%, 0.3)`,
                         }}
                       >
-                        {isLast ? "🏁" : index + 1}
+                        {isLast ? <Flag size={12} /> : index + 1}
                       </div>
                     </div>
 
@@ -304,7 +305,7 @@ export function CreateHabitForm() {
                           value={stage.label}
                           onChange={(e) => updateStage(index, "label", e.target.value)}
                           placeholder={`Tahap ${index + 1}`}
-                          className="flex-1 px-3 py-1.5 bg-zinc-800/60 border border-zinc-700/50 rounded-lg text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-amber-500/40 transition-all"
+                          className="flex-1 px-3 py-1.5 bg-white dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/50 rounded-lg text-sm text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-amber-500/40 transition-all"
                         />
                         <div className="flex items-center gap-1 shrink-0">
                           <input
@@ -313,7 +314,7 @@ export function CreateHabitForm() {
                             onChange={(e) => updateStage(index, "targetDays", e.target.value)}
                             min="1"
                             max="365"
-                            className="w-14 px-2 py-1.5 bg-zinc-800/60 border border-zinc-700/50 rounded-lg text-sm text-zinc-100 text-center focus:outline-none focus:ring-1 focus:ring-amber-500/40 transition-all"
+                            className="w-14 px-2 py-1.5 bg-white dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/50 rounded-lg text-sm text-zinc-900 dark:text-zinc-100 text-center focus:outline-none focus:ring-1 focus:ring-amber-500/40 transition-all"
                           />
                           <span className="text-[10px] text-zinc-600">hari</span>
                         </div>
@@ -323,9 +324,7 @@ export function CreateHabitForm() {
                             onClick={() => removeStage(index)}
                             className="text-zinc-700 hover:text-red-400 transition-colors cursor-pointer opacity-0 group-hover:opacity-100"
                           >
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
+                            <X size={16} />
                           </button>
                         )}
                       </div>
@@ -336,7 +335,7 @@ export function CreateHabitForm() {
             </div>
 
             {/* Summary */}
-            <div className="mt-2 pt-3 border-t border-zinc-800/50 flex items-center justify-between text-xs text-zinc-600">
+            <div className="mt-2 pt-3 border-t border-zinc-200 dark:border-zinc-800/50 flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-600">
               <span>{stages.length} tahap</span>
               <span>
                 Total ±{stages.reduce((sum, s) => sum + (parseInt(s.targetDays) || 0), 0)} hari
@@ -350,12 +349,13 @@ export function CreateHabitForm() {
       <button
         type="submit"
         disabled={!isValid}
-        className={`w-full py-3.5 rounded-xl font-bold text-base transition-all duration-300 cursor-pointer ${isValid
-          ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 active:scale-[0.98]"
-          : "bg-zinc-800 text-zinc-600 cursor-not-allowed"
+        className={`w-full py-3.5 rounded-xl font-bold text-base transition-all duration-300 cursor-pointer flex items-center justify-center gap-2 ${isValid
+          ? "bg-linear-to-r from-amber-500 to-orange-500 text-white shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 active:scale-[0.98]"
+          : "bg-zinc-200 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-600 cursor-not-allowed"
           }`}
       >
-        Mulai Kebiasaan Baru 🚀
+        <Rocket size={18} />
+        Mulai Kebiasaan Baru
       </button>
     </form>
   );

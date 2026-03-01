@@ -1,4 +1,5 @@
 import type { HabitStage } from "~/store/useHabitStore";
+import { Check, Flag } from "lucide-react";
 
 interface StageRoadmapProps {
   stages: HabitStage[];
@@ -17,7 +18,7 @@ export function StageRoadmap({
         {stages.map((stage, index) => {
           const isCompleted = index < currentStageIndex;
           const isCurrent = index === currentStageIndex;
-          const isFuture = index > currentStageIndex;
+          const isLast = index === stages.length - 1;
           const progress = isCurrent
             ? Math.min((currentStageProgress / stage.targetDays) * 100, 100)
             : isCompleted
@@ -35,31 +36,31 @@ export function StageRoadmap({
                     ${isCompleted
                       ? "bg-emerald-500 text-white shadow-[0_0_12px_rgba(16,185,129,0.5)]"
                       : isCurrent
-                        ? "bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-[0_0_16px_rgba(251,191,36,0.5)] scale-110"
-                        : "bg-zinc-800 text-zinc-500 border-2 border-zinc-700"
+                        ? "bg-linear-to-br from-amber-400 to-orange-500 text-white shadow-[0_0_16px_rgba(251,191,36,0.5)] scale-110"
+                        : "bg-zinc-200 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 border-2 border-zinc-300 dark:border-zinc-700"
                     }
                   `}
                 >
                   {isCompleted ? (
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
+                    <Check size={18} strokeWidth={3} />
+                  ) : isLast ? (
+                    <Flag size={16} />
                   ) : (
                     index + 1
                   )}
                 </div>
                 <span
                   className={`text-xs mt-1.5 text-center max-w-[80px] truncate ${isCurrent
-                      ? "text-amber-400 font-semibold"
+                      ? "text-amber-500 dark:text-amber-400 font-semibold"
                       : isCompleted
-                        ? "text-emerald-400"
-                        : "text-zinc-600"
+                        ? "text-emerald-500 dark:text-emerald-400"
+                        : "text-zinc-400 dark:text-zinc-600"
                     }`}
                 >
                   {stage.label}
                 </span>
                 {isCurrent && (
-                  <span className="text-[10px] text-zinc-500 mt-0.5">
+                  <span className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-0.5">
                     {currentStageProgress}/{stage.targetDays} hari
                   </span>
                 )}
@@ -67,7 +68,7 @@ export function StageRoadmap({
 
               {/* Connector line */}
               {index < stages.length - 1 && (
-                <div className="flex-1 h-1 mx-1.5 bg-zinc-800 rounded-full overflow-hidden relative self-start mt-5">
+                <div className="flex-1 h-1 mx-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden relative self-start mt-5">
                   <div
                     className="h-full rounded-full transition-all duration-700 ease-out"
                     style={{
