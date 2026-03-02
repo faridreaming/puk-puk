@@ -16,6 +16,17 @@ export const useThemeStore = create<ThemeStore>()(
 
       setTheme: (theme) => {
         set({ theme });
+        // Sync DOM immediately
+        if (typeof document !== "undefined") {
+          const resolved =
+            theme === "system"
+              ? window.matchMedia("(prefers-color-scheme: dark)").matches
+                ? "dark"
+                : "light"
+              : theme;
+          document.documentElement.classList.remove("light", "dark");
+          document.documentElement.classList.add(resolved);
+        }
       },
 
       getResolvedTheme: () => {

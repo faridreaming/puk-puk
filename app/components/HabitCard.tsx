@@ -4,6 +4,7 @@ import { useHabitStore, getStreak } from "~/store/useHabitStore";
 import { useToastStore } from "~/store/useToastStore";
 import { LivesIndicator } from "./LivesIndicator";
 import { WeeklyTracker } from "./WeeklyTracker";
+import { ActionButton } from "./ui/ActionButton";
 import { Check, X, Flame, ChevronRight, Trophy } from "lucide-react";
 import { useToday } from "~/store/useDevStore";
 import { useDialogStore } from "~/store/useDialogStore";
@@ -132,38 +133,40 @@ export function HabitCard({ habit }: HabitCardProps) {
         {/* Weekly Tracker */}
         {!isComplete && (
           <div className="mb-4">
-            <WeeklyTracker habitId={habit.id} completedDates={habit.completedDates} missedDates={habit.missedDates} />
+            <WeeklyTracker habitId={habit.id} completedDates={habit.completedDates} missedDates={habit.missedDates} createdAt={habit.createdAt} />
           </div>
         )}
 
-        {/* Action buttons */}
+        {/* Action buttons — using ActionButton for consistency & touch-friendly sizing */}
         {!isComplete && (
           <div className="flex gap-2">
             {alreadyTrackedToday ? (
               <div
-                className={`flex-1 flex items-center justify-center py-2 rounded-xl text-center text-sm font-medium gap-1.5 ${completedToday
+                className={`flex-1 flex items-center justify-center min-h-[44px] py-2.5 rounded-xl text-center text-sm font-medium gap-1.5 box-border ${completedToday
                   ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-500/15"
                   : "bg-red-50 dark:bg-red-500/10 text-red-500 dark:text-red-400 border border-red-200/60 dark:border-red-500/15"
                   }`}
               >
-                {completedToday ? <><Check size={14} /> Selesai</> : <><X size={14} /> Terlewat</>}
+                {completedToday ? <><Check size={16} strokeWidth={2.5} /> Selesai</> : <><X size={16} strokeWidth={2.5} /> Terlewat</>}
               </div>
             ) : (
               <>
-                <button
+                <ActionButton
+                  variant="success"
                   onClick={handleComplete}
-                  className="flex-1 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-semibold text-sm transition-all duration-200 active:scale-95 cursor-pointer shadow-md shadow-emerald-500/20 flex items-center justify-center gap-1.5"
+                  className="flex-1"
                 >
                   <Check size={16} strokeWidth={2.5} />
                   Tandai Selesai
-                </button>
-                <button
+                </ActionButton>
+                <ActionButton
+                  variant="ghost"
                   onClick={handleMissed}
-                  className="flex-1 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-500 dark:text-zinc-400 font-medium text-sm transition-all duration-200 active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 box-content"
+                  className="flex-1"
                 >
                   <X size={16} strokeWidth={2.5} />
                   Tandai Terlewat
-                </button>
+                </ActionButton>
               </>
             )}
           </div>

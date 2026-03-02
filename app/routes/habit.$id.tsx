@@ -5,9 +5,15 @@ import { useDialogStore } from "~/store/useDialogStore";
 import { StageRoadmap } from "~/components/StageRoadmap";
 import { WeeklyTracker } from "~/components/WeeklyTracker";
 import { LivesIndicator } from "~/components/LivesIndicator";
+import { PageShell } from "~/components/ui/PageShell";
+import { Section } from "~/components/ui/Section";
+import { ActionButton } from "~/components/ui/ActionButton";
+import { SectionLabel } from "~/components/ui/SectionLabel";
+import { StatCard } from "~/components/ui/StatCard";
+import { IconButton } from "~/components/ui/IconButton";
 import type { Route } from "./+types/habit.$id";
 import { useState } from "react";
-import { ChevronLeft, Pencil, Check, X, Undo2, Flame, RotateCcw, Trash2, Search } from "lucide-react";
+import { Pencil, Check, X, Undo2, Flame, RotateCcw, Trash2, Search, ChevronDown } from "lucide-react";
 import { useToday } from "~/store/useDevStore";
 
 export function meta({ params }: Route.MetaArgs) {
@@ -31,19 +37,19 @@ export default function HabitDetail({ params }: Route.ComponentProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState("");
   const [editIcon, setEditIcon] = useState("");
+  const [showDangerZone, setShowDangerZone] = useState(false);
 
   if (!habit) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-zinc-950 flex items-center justify-center transition-colors">
-        <div className="text-center">
+      <PageShell title="Tidak Ditemukan" backTo="/" maxWidth="md">
+        <div className="flex flex-col items-center justify-center py-16 text-center">
           <Search size={48} className="text-zinc-300 dark:text-zinc-700 mx-auto mb-4" />
           <p className="text-zinc-500 dark:text-zinc-400 mb-4">Kebiasaan tidak ditemukan</p>
-          <Link to="/" className="text-amber-500 hover:text-amber-400 font-semibold inline-flex items-center gap-1">
-            <ChevronLeft size={16} />
-            Kembali
+          <Link to="/" className="text-amber-500 hover:text-amber-400 font-semibold">
+            ← Kembali
           </Link>
         </div>
-      </div>
+      </PageShell>
     );
   }
 
@@ -151,38 +157,20 @@ export default function HabitDetail({ params }: Route.ComponentProps) {
   const EMOJI_OPTIONS = ["🧘", "🏃", "📚", "💪", "🎯", "✍️", "🥗", "💤", "🧹", "💻", "🚫"];
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-zinc-950 transition-colors">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl border-b border-zinc-200 dark:border-zinc-800/50 transition-colors">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-4 flex items-center gap-3">
-          <Link
-            to="/"
-            className="w-9 h-9 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 flex items-center justify-center transition-colors"
-          >
-            <ChevronLeft size={20} className="text-zinc-500 dark:text-zinc-400" />
-          </Link>
-          <div className="flex-1">
-            <h1 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-              <span>{habit.icon}</span>
-              {habit.name}
-            </h1>
-          </div>
-          <button
-            onClick={startEditing}
-            className="w-9 h-9 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 flex items-center justify-center transition-colors cursor-pointer"
-            title="Edit"
-          >
-            <Pencil size={16} className="text-zinc-500 dark:text-zinc-400" />
-          </button>
-        </div>
-      </header>
-
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+    <PageShell
+      title={`${habit.icon} ${habit.name}`}
+      backTo="/"
+      maxWidth="md"
+      headerRight={
+        <IconButton icon={Pencil} onClick={startEditing} title="Edit" />
+      }
+    >
+      <div className="space-y-6">
         {/* Edit panel */}
         {isEditing && (
-          <div className="bg-white dark:bg-zinc-900/80 backdrop-blur-sm border border-amber-300 dark:border-amber-500/20 rounded-2xl p-5 space-y-4 transition-colors">
-            <h3 className="text-sm font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Edit Kebiasaan</h3>
-            <div className="flex flex-wrap gap-2">
+          <Section className="border-amber-300 dark:border-amber-500/20">
+            <h3 className="text-sm font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider mb-4">Edit Kebiasaan</h3>
+            <div className="flex flex-wrap gap-2 mb-4">
               {EMOJI_OPTIONS.map((emoji) => (
                 <button
                   key={emoji}
@@ -201,51 +189,54 @@ export default function HabitDetail({ params }: Route.ComponentProps) {
               type="text"
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
-              className="w-full px-4 py-2.5 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-500/50 transition-all"
+              className="w-full px-4 py-2.5 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-500/50 transition-all mb-4"
             />
             <div className="flex gap-2">
-              <button
-                onClick={saveEdit}
-                className="flex-1 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-white font-semibold text-sm transition-all cursor-pointer flex items-center justify-center gap-1.5"
-              >
-                <Check size={16} />
-                Simpan
-              </button>
-              <button
-                onClick={() => setIsEditing(false)}
-                className="py-2 px-4 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-400 font-semibold text-sm transition-all cursor-pointer border border-zinc-200 dark:border-zinc-700"
-              >
+              <ActionButton variant="primary" onClick={saveEdit} className="flex-1">
+                <Check size={16} /> Simpan
+              </ActionButton>
+              <ActionButton variant="ghost" onClick={() => setIsEditing(false)}>
                 Batal
-              </button>
+              </ActionButton>
             </div>
-          </div>
+          </Section>
         )}
 
-        {/* Desktop: two-column layout */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Desktop: two-column layout, Mobile: single column */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           {/* Left column */}
-          <div className="space-y-6">
-            {/* Stats bar */}
-            <div className="grid grid-cols-4 gap-2">
-              {[
-                { value: streak, label: "Streak", color: "text-amber-500 dark:text-amber-400", icon: <Flame size={16} className="inline fill-amber-500 dark:fill-amber-400" /> },
-                { value: habit.completedDates.length, label: "Selesai", color: "text-emerald-600 dark:text-emerald-400", icon: <Check size={16} className="inline" /> },
-                { value: habit.missedDates.length, label: "Terlewat", color: "text-red-500 dark:text-red-400", icon: <X size={16} className="inline" /> },
-                { value: `${successRate}%`, label: "Sukses", color: "text-blue-500 dark:text-blue-400", icon: null },
-              ].map((stat) => (
-                <div key={stat.label} className="bg-white dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-center transition-colors">
-                  <p className={`text-xl font-bold ${stat.color} flex items-center justify-center gap-1`}>
-                    {stat.icon} {stat.value}
-                  </p>
-                  <p className="text-[9px] text-zinc-500 mt-0.5 uppercase tracking-wider">{stat.label}</p>
-                </div>
-              ))}
+          <div className="space-y-4 md:space-y-6">
+            {/* Stats bar — 2 cols on mobile, 4 on desktop */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              <StatCard
+                value={streak}
+                label="Streak"
+                color="text-amber-500 dark:text-amber-400"
+                icon={<Flame size={16} className="inline fill-amber-500 dark:fill-amber-400" />}
+              />
+              <StatCard
+                value={habit.completedDates.length}
+                label="Selesai"
+                color="text-emerald-600 dark:text-emerald-400"
+                icon={<Check size={16} className="inline" />}
+              />
+              <StatCard
+                value={habit.missedDates.length}
+                label="Terlewat"
+                color="text-red-500 dark:text-red-400"
+                icon={<X size={16} className="inline" />}
+              />
+              <StatCard
+                value={`${successRate}%`}
+                label="Sukses"
+                color="text-blue-500 dark:text-blue-400"
+              />
             </div>
 
             {/* Target + lives */}
-            <div className="bg-white dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 transition-colors">
+            <Section>
               <div className="flex items-center justify-between mb-2">
-                <p className="text-xs text-zinc-500 font-semibold uppercase tracking-wider">Target Akhir</p>
+                <SectionLabel>Target Akhir</SectionLabel>
                 <LivesIndicator lives={habit.lives} maxLives={habit.maxLives} />
               </div>
               <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{habit.targetLabel}</p>
@@ -255,73 +246,83 @@ export default function HabitDetail({ params }: Route.ComponentProps) {
                   Selamat! Target tercapai!
                 </div>
               )}
-            </div>
+            </Section>
 
             {/* Daily action */}
             {!isComplete && (
-              <div className="bg-white dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 transition-colors">
-                <p className="text-xs text-zinc-500 font-semibold uppercase tracking-wider mb-1">Hari Ini</p>
+              <Section>
+                <SectionLabel className="mb-1">Hari Ini</SectionLabel>
                 <p className="text-base font-semibold text-zinc-700 dark:text-zinc-300 mb-4">{currentStage?.label}</p>
                 {alreadyTrackedToday ? (
                   <div className="flex items-center gap-2">
                     <div
-                      className={`flex-1 py-3 rounded-xl text-center text-sm font-semibold flex items-center justify-center gap-1.5 ${completedToday
+                      className={`flex-1 min-h-[44px] py-3 rounded-xl text-center text-sm font-semibold flex items-center justify-center gap-1.5 ${completedToday
                         ? "bg-emerald-50 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20"
                         : "bg-red-50 dark:bg-red-500/15 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-500/20"
                         }`}
                     >
                       {completedToday ? <><Check size={16} /> Sudah selesai hari ini</> : <><X size={16} /> Terlewat hari ini</>}
                     </div>
-                    <button
-                      onClick={handleUndo}
-                      className="py-3 px-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-500 transition-all active:scale-95 cursor-pointer border border-zinc-200 dark:border-zinc-700/50"
-                    >
+                    <ActionButton variant="ghost" onClick={handleUndo} className="px-3">
                       <Undo2 size={16} />
-                    </button>
+                    </ActionButton>
                   </div>
                 ) : (
-                  <div className="flex gap-2">
-                    <button onClick={handleComplete} className="flex-1 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-semibold text-sm transition-all active:scale-95 cursor-pointer shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-1.5">
-                      <Check size={16} />
-                      Selesai
-                    </button>
-                    <button onClick={handleMissed} className="py-3 px-5 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-400 font-semibold text-sm transition-all active:scale-95 cursor-pointer border border-zinc-200 dark:border-zinc-700">
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <ActionButton variant="success" onClick={handleComplete} className="flex-1">
+                      <Check size={16} /> Selesai
+                    </ActionButton>
+                    <ActionButton variant="ghost" onClick={handleMissed} className="flex-1 sm:flex-none sm:px-5">
                       Terlewat
-                    </button>
+                    </ActionButton>
                   </div>
                 )}
-              </div>
+              </Section>
             )}
           </div>
 
           {/* Right column */}
-          <div className="space-y-6">
+          <div className="space-y-4 md:space-y-6">
             {/* Stage Roadmap */}
-            <div className="bg-white dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 transition-colors">
-              <p className="text-xs text-zinc-500 font-semibold uppercase tracking-wider mb-4">Peta Tahapan</p>
+            <Section title="Peta Tahapan">
               <StageRoadmap stages={habit.stages} currentStageIndex={habit.currentStageIndex} currentStageProgress={habit.currentStageProgress} />
-            </div>
+            </Section>
 
             {/* Weekly Tracker */}
-            <div className="bg-white dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 transition-colors">
-              <WeeklyTracker habitId={habit.id} completedDates={habit.completedDates} missedDates={habit.missedDates} />
-            </div>
+            <Section>
+              <WeeklyTracker habitId={habit.id} completedDates={habit.completedDates} missedDates={habit.missedDates} createdAt={habit.createdAt} />
+            </Section>
           </div>
         </div>
 
-        {/* Danger Zone */}
-        <div className="pt-4 border-t border-zinc-200 dark:border-zinc-800/50 space-y-3 transition-colors">
-          <button onClick={handleReset} className="w-full py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-500 text-sm font-medium transition-all cursor-pointer border border-zinc-200 dark:border-zinc-800 flex items-center justify-center gap-1.5">
-            <RotateCcw size={14} />
-            Mulai Ulang dari Awal
+        {/* Danger Zone — collapsible on mobile */}
+        <div className="border-t border-zinc-200 dark:border-zinc-800/50 pt-4 transition-colors">
+          <button
+            onClick={() => setShowDangerZone(!showDangerZone)}
+            className="flex items-center justify-between w-full text-left cursor-pointer group md:hidden mb-3"
+          >
+            <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider group-hover:text-zinc-500 transition-colors">
+              Zona Bahaya
+            </span>
+            <ChevronDown
+              size={14}
+              className={`text-zinc-400 transition-transform ${showDangerZone ? "rotate-180" : ""}`}
+            />
           </button>
 
-          <button onClick={handleDelete} className="w-full py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 hover:bg-red-50 dark:hover:bg-red-500/10 text-zinc-500 dark:text-zinc-600 hover:text-red-600 dark:hover:text-red-400 text-sm font-medium transition-all cursor-pointer border border-zinc-200 dark:border-zinc-800 hover:border-red-200 dark:hover:border-red-500/20 flex items-center justify-center gap-1.5">
-            <Trash2 size={14} />
-            Hapus Kebiasaan
-          </button>
+          <div className={`space-y-3 md:block ${showDangerZone ? "block" : "hidden"}`}>
+            <button onClick={handleReset} className="w-full min-h-[44px] py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-500 text-sm font-medium transition-all cursor-pointer border border-zinc-200 dark:border-zinc-800 flex items-center justify-center gap-1.5">
+              <RotateCcw size={14} />
+              Mulai Ulang dari Awal
+            </button>
+
+            <button onClick={handleDelete} className="w-full min-h-[44px] py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 hover:bg-red-50 dark:hover:bg-red-500/10 text-zinc-500 dark:text-zinc-600 hover:text-red-600 dark:hover:text-red-400 text-sm font-medium transition-all cursor-pointer border border-zinc-200 dark:border-zinc-800 hover:border-red-200 dark:hover:border-red-500/20 flex items-center justify-center gap-1.5">
+              <Trash2 size={14} />
+              Hapus Kebiasaan
+            </button>
+          </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </PageShell>
   );
 }

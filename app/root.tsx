@@ -9,6 +9,7 @@ import {
 import { useEffect, useState } from "react";
 import { ToastContainer } from "~/components/ToastContainer";
 import { DevTools } from "~/components/DevTools";
+import { BottomNav } from "~/components/BottomNav";
 import { ConfirmDialog } from "~/components/ConfirmDialog";
 import { useThemeStore } from "~/store/useThemeStore";
 
@@ -32,20 +33,32 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
+/** Read theme directly from localStorage (synchronous, no Zustand async delay) */
+function readThemeFromStorage(): "light" | "dark" {
+  if (typeof window === "undefined") return "dark";
+  try {
+    const stored = localStorage.getItem("pukpuk-theme");
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      const theme = parsed?.state?.theme || "dark";
+      if (theme === "system") {
+        return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      return theme as "light" | "dark";
+    }
+  } catch { /* fallback */ }
+  return "dark";
+}
+
 export function Layout({ children }: { children: React.ReactNode }) {
   const theme = useThemeStore((s) => s.theme);
-  // Ensure we consistently use the resolved theme (dark or light)
-  const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">(
-    () => {
-      // During SSR, fallback to dark
-      if (typeof window === "undefined") return "dark";
-      // During client hydration, read the actual resolved theme synchronously
-      return useThemeStore.getState().getResolvedTheme();
-    }
-  );
+  // Read directly from localStorage on first render (Zustand persist is async!)
+  const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">(readThemeFromStorage);
 
   useEffect(() => {
-    setResolvedTheme(useThemeStore.getState().getResolvedTheme());
+    // After Zustand has rehydrated, sync with store changes
+    const resolved = useThemeStore.getState().getResolvedTheme();
+    setResolvedTheme(resolved);
   }, [theme]);
 
   return (
@@ -69,8 +82,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
                   if (theme === 'system') {
                     theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
                   }
+                  document.documentElement.classList.remove('light', 'dark');
                   document.documentElement.classList.add(theme);
                 } catch(e) {
+                  document.documentElement.classList.remove('light');
                   document.documentElement.classList.add('dark');
                 }
               })();
@@ -94,6 +109,7 @@ export default function App() {
       <ConfirmDialog />
       <DevTools />
       <Outlet />
+      <BottomNav />
     </>
   );
 }
