@@ -3,6 +3,7 @@ import { Check, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useToday, useTodayDate } from "~/store/useDevStore";
 import { useHabitStore } from "~/store/useHabitStore";
 import { useToastStore } from "~/store/useToastStore";
+import { useDialogStore } from "~/store/useDialogStore";
 
 interface WeeklyTrackerProps {
   habitId: string;
@@ -79,6 +80,7 @@ export function WeeklyTracker({ habitId, completedDates, missedDates, createdAt 
   const markComplete = useHabitStore((s) => s.markComplete);
   const markMissed = useHabitStore((s) => s.markMissed);
   const addToast = useToastStore((s) => s.addToast);
+  const openDialog = useDialogStore((s) => s.openDialog);
 
   const [activeDate, setActiveDate] = useState<string | null>(null);
   const [exitingDate, setExitingDate] = useState<string | null>(null);
@@ -113,30 +115,54 @@ export function WeeklyTracker({ habitId, completedDates, missedDates, createdAt 
     };
   }, [activeDate]);
 
+  const formatDateLabel = (date: string) => {
+    return new Date(date + "T00:00:00").toLocaleDateString("id-ID", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+    });
+  };
+
   const handleComplete = (date: string) => {
-    const result = markComplete(habitId, date);
-    if (result.type === "complete") {
-      addToast({
-        message: result.stageUp ? "Naik tahap!" : "Dicatat selesai!",
-        type: "success",
-        duration: 2000,
-      });
-    }
     setActiveDate(null);
     setExitingDate(null);
+    openDialog({
+      title: "Tandai selesai?",
+      message: `Tandai hari ${formatDateLabel(date)} sebagai selesai.`,
+      confirmLabel: "Ya, selesai",
+      variant: "info",
+      onConfirm: () => {
+        const result = markComplete(habitId, date);
+        if (result.type === "complete") {
+          addToast({
+            message: result.stageUp ? "Naik tahap!" : "Dicatat selesai!",
+            type: "success",
+            duration: 2000,
+          });
+        }
+      },
+    });
   };
 
   const handleMissed = (date: string) => {
-    const result = markMissed(habitId, date);
-    if (result.type === "missed") {
-      addToast({
-        message: result.stageDown ? "Nyawa habis, turun tahap" : `Sisa ${result.livesLeft} nyawa`,
-        type: "warning",
-        duration: 2500,
-      });
-    }
     setActiveDate(null);
     setExitingDate(null);
+    openDialog({
+      title: "Tandai terlewat?",
+      message: `Tandai hari ${formatDateLabel(date)} sebagai terlewat. Nyawa akan berkurang.`,
+      confirmLabel: "Ya, terlewat",
+      variant: "warning",
+      onConfirm: () => {
+        const result = markMissed(habitId, date);
+        if (result.type === "missed") {
+          addToast({
+            message: result.stageDown ? "Nyawa habis, turun tahap" : `Sisa ${result.livesLeft} nyawa`,
+            type: "warning",
+            duration: 2500,
+          });
+        }
+      },
+    });
   };
 
   return (

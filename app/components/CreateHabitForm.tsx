@@ -319,7 +319,7 @@ export function CreateHabitForm() {
                           boxShadow: `0 0 10px hsla(${hue}, 80%, 55%, 0.3)`,
                         }}
                       >
-                        {isLast ? <Flag size={12} /> : index + 1}
+                        {isLast ? <Flag size={12} strokeWidth={3.5} /> : index + 1}
                       </div>
                     </div>
 
