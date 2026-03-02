@@ -1,20 +1,13 @@
 import { useDialogStore } from "~/store/useDialogStore";
 import { X } from "lucide-react";
 import { useEffect, useRef } from "react";
+import { ActionButton } from "~/components/ui/ActionButton";
+import { IconButton } from "~/components/ui/IconButton";
 
-const VARIANT_STYLES = {
-  danger: {
-    confirmBtn:
-      "bg-red-600 hover:bg-red-500 text-white shadow-md shadow-red-500/20",
-  },
-  warning: {
-    confirmBtn:
-      "bg-amber-500 hover:bg-amber-400 text-white shadow-md shadow-amber-500/20",
-  },
-  info: {
-    confirmBtn:
-      "bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-500/20",
-  },
+const DIALOG_VARIANT_TO_BUTTON: Record<string, "danger" | "warning" | "info"> = {
+  danger: "danger",
+  warning: "warning",
+  info: "info",
 };
 
 export function ConfirmDialog() {
@@ -41,7 +34,7 @@ export function ConfirmDialog() {
 
   if (!isOpen) return null;
 
-  const style = VARIANT_STYLES[variant];
+  const buttonVariant = DIALOG_VARIANT_TO_BUTTON[variant] ?? "info";
 
   const handleConfirm = () => {
     onConfirm?.();
@@ -61,8 +54,8 @@ export function ConfirmDialog() {
     >
       <div
         className={`bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl shadow-black/20 w-full max-w-sm transition-all duration-200 ${isExiting
-            ? "opacity-0 scale-95 translate-y-2"
-            : "animate-[dialogIn_0.2s_ease-out]"
+          ? "opacity-0 scale-95 translate-y-2"
+          : "animate-[dialogIn_0.2s_ease-out]"
           }`}
       >
         {/* Header */}
@@ -75,28 +68,17 @@ export function ConfirmDialog() {
               {message}
             </p>
           </div>
-          <button
-            onClick={closeDialog}
-            className="w-8 h-8 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors cursor-pointer shrink-0"
-          >
-            <X size={16} />
-          </button>
+          <IconButton icon={X} onClick={closeDialog} size={16} />
         </div>
 
         {/* Actions */}
         <div className="flex gap-2 p-5 pt-3">
-          <button
-            onClick={closeDialog}
-            className="flex-1 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-400 font-semibold text-sm transition-all active:scale-[0.98] cursor-pointer border border-zinc-200 dark:border-zinc-700"
-          >
+          <ActionButton variant="ghost" onClick={closeDialog} className="flex-1">
             {cancelLabel}
-          </button>
-          <button
-            onClick={handleConfirm}
-            className={`flex-1 py-2.5 rounded-xl font-semibold text-sm transition-all active:scale-[0.98] cursor-pointer ${style.confirmBtn}`}
-          >
+          </ActionButton>
+          <ActionButton variant={buttonVariant} onClick={handleConfirm} className="flex-1" autoFocus>
             {confirmLabel}
-          </button>
+          </ActionButton>
         </div>
       </div>
     </div>

@@ -157,7 +157,7 @@ export function HabitCard({ habit }: HabitCardProps) {
                   className="flex-1"
                 >
                   <Check size={16} strokeWidth={2.5} />
-                  Tandai Selesai
+                  Selesai
                 </ActionButton>
                 <ActionButton
                   variant="ghost"
@@ -165,7 +165,7 @@ export function HabitCard({ habit }: HabitCardProps) {
                   className="flex-1"
                 >
                   <X size={16} strokeWidth={2.5} />
-                  Tandai Terlewat
+                  Terlewat
                 </ActionButton>
               </>
             )}
