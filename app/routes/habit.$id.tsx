@@ -233,17 +233,49 @@ export default function HabitDetail({ params }: Route.ComponentProps) {
               />
             </div>
 
-            {/* Target + lives */}
+            {/* Current stage + target info */}
             <Section>
-              <div className="flex items-center justify-between mb-2">
-                <SectionLabel>Target Akhir</SectionLabel>
+              <div className="flex items-center justify-between mb-3">
+                <SectionLabel>Tahap Saat Ini</SectionLabel>
                 <LivesIndicator lives={habit.lives} maxLives={habit.maxLives} />
               </div>
-              <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{habit.targetLabel}</p>
-              {isComplete && (
-                <div className="mt-3 px-4 py-2 bg-emerald-50 dark:bg-emerald-500/15 border border-emerald-200 dark:border-emerald-500/20 rounded-xl text-emerald-600 dark:text-emerald-400 font-semibold text-sm text-center flex items-center justify-center gap-1.5">
+
+              {!isComplete && currentStage ? (
+                <div className="space-y-3">
+                  {/* Current stage label + number */}
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-500/15 text-amber-600 dark:text-amber-400 text-xs font-bold">
+                      {habit.currentStageIndex + 1}/{habit.stages.length}
+                    </span>
+                    <p className="text-base font-bold text-zinc-900 dark:text-zinc-100">{currentStage.label}</p>
+                  </div>
+
+                  {/* Stage progress bar */}
+                  <div>
+                    <div className="flex items-center justify-between text-xs mb-1.5">
+                      <span className="text-zinc-500 font-medium">Progres tahap</span>
+                      <span className="font-bold text-zinc-700 dark:text-zinc-300 tabular-nums">
+                        {habit.currentStageProgress}/{currentStage.targetDays} hari
+                      </span>
+                    </div>
+                    <div className="h-2 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-amber-500 rounded-full transition-all duration-500"
+                        style={{ width: `${Math.min(100, (habit.currentStageProgress / currentStage.targetDays) * 100)}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Final target */}
+                  <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800/50 flex items-center justify-between">
+                    <span className="text-xs text-zinc-400 font-medium">Target akhir</span>
+                    <span className="text-sm font-semibold text-zinc-600 dark:text-zinc-400">{habit.targetLabel}</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-1 px-4 py-2.5 bg-emerald-50 dark:bg-emerald-500/15 border border-emerald-200 dark:border-emerald-500/20 rounded-xl text-emerald-600 dark:text-emerald-400 font-semibold text-sm text-center flex items-center justify-center gap-1.5">
                   <Check size={16} />
-                  Selamat! Target tercapai!
+                  Selamat! Target tercapai: {habit.targetLabel}
                 </div>
               )}
             </Section>

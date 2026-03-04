@@ -287,24 +287,6 @@ export function WeeklyTracker({ habitId, completedDates, missedDates, createdAt 
           );
         })}
       </div>
-
-      {/* Mini progress bar for the week */}
-      {weekTotal > 0 && (
-        <div className="mt-3 h-1.5 bg-zinc-100 dark:bg-zinc-800/60 rounded-full overflow-hidden flex">
-          {weekCompleted > 0 && (
-            <div
-              className="h-full bg-emerald-500/70 rounded-full transition-all duration-500"
-              style={{ width: `${(weekCompleted / 7) * 100}%` }}
-            />
-          )}
-          {weekMissed > 0 && (
-            <div
-              className="h-full bg-red-500/50 rounded-full transition-all duration-500"
-              style={{ width: `${(weekMissed / 7) * 100}%` }}
-            />
-          )}
-        </div>
-      )}
     </div>
   );
 }

@@ -5,7 +5,7 @@ import { useToastStore } from "~/store/useToastStore";
 import { LivesIndicator } from "./LivesIndicator";
 import { WeeklyTracker } from "./WeeklyTracker";
 import { ActionButton } from "./ui/ActionButton";
-import { Check, X, Flame, ChevronRight, Trophy } from "lucide-react";
+import { Check, X, Flame, ChevronRight, Trophy, Undo2 } from "lucide-react";
 import { useToday } from "~/store/useDevStore";
 import { useDialogStore } from "~/store/useDialogStore";
 
@@ -16,6 +16,7 @@ interface HabitCardProps {
 export function HabitCard({ habit }: HabitCardProps) {
   const markComplete = useHabitStore((s) => s.markComplete);
   const markMissed = useHabitStore((s) => s.markMissed);
+  const undoToday = useHabitStore((s) => s.undoToday);
   const addToast = useToastStore((s) => s.addToast);
   const openDialog = useDialogStore((s) => s.openDialog);
 
@@ -83,6 +84,22 @@ export function HabitCard({ habit }: HabitCardProps) {
     });
   };
 
+  const handleUndo = (e: React.MouseEvent) => {
+    e.preventDefault();
+    openDialog({
+      title: "Batalkan tanda hari ini?",
+      message: completedToday
+        ? "Status selesai hari ini akan dibatalkan."
+        : "Status terlewat hari ini akan dibatalkan. Nyawa akan dikembalikan.",
+      confirmLabel: "Ya, batalkan",
+      variant: "warning",
+      onConfirm: () => {
+        undoToday(habit.id, today);
+        addToast({ message: "Tanda hari ini dibatalkan.", type: "info" });
+      },
+    });
+  };
+
 
   return (
     <div className="relative group bg-white dark:bg-zinc-900/80 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden transition-all duration-300 hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-lg hover:shadow-black/5 dark:hover:shadow-black/20">
@@ -91,7 +108,7 @@ export function HabitCard({ habit }: HabitCardProps) {
         {/* Header: icon + info + link arrow */}
         <Link
           to={`/kebiasaan/${habit.id}`}
-          className="flex items-center gap-3 mb-4 group/link"
+          className="flex items-center gap-3 mb-3 group/link"
         >
           {/* Icon container */}
           <div className="w-12 h-12 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-2xl shrink-0 transition-colors group-hover/link:bg-zinc-200 dark:group-hover/link:bg-zinc-700">
@@ -106,16 +123,41 @@ export function HabitCard({ habit }: HabitCardProps) {
                 <span className="text-emerald-600 dark:text-emerald-400 font-semibold inline-flex items-center gap-1">
                   <Trophy size={11} /> Target tercapai!
                 </span>
-              ) : (
-                <>Tahap {habit.currentStageIndex + 1}/{habit.stages.length}: {currentStage?.label}</>
-              )}
+              ) : currentStage ? (
+                <>Hari ini: {currentStage.label}</>
+              ) : null}
             </p>
           </div>
           <ChevronRight size={16} className="text-zinc-400 dark:text-zinc-600 shrink-0 transition-transform group-hover/link:translate-x-0.5" />
         </Link>
 
+        {/* Current stage info — what to do TODAY */}
+        {!isComplete && currentStage && (
+          <div className="mb-3 px-3 py-2.5 rounded-xl bg-amber-50/80 dark:bg-amber-500/8 border border-amber-200/40 dark:border-amber-500/10">
+            <div className="flex items-center justify-between mb-1.5">
+              <div className="flex items-center gap-1.5">
+                <span className="px-1.5 py-0.5 rounded bg-amber-200/60 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 text-[10px] font-bold">
+                  Tahap {habit.currentStageIndex + 1}/{habit.stages.length}
+                </span>
+                <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">
+                  {currentStage.label}
+                </span>
+              </div>
+              <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 tabular-nums">
+                {habit.currentStageProgress}/{currentStage.targetDays}
+              </span>
+            </div>
+            <div className="h-1.5 bg-amber-200/40 dark:bg-amber-500/10 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-amber-500 rounded-full transition-all duration-500"
+                style={{ width: `${Math.min(100, (habit.currentStageProgress / currentStage.targetDays) * 100)}%` }}
+              />
+            </div>
+          </div>
+        )}
+
         {/* Stats row */}
-        <div className="flex items-center gap-3 mb-4 text-xs">
+        <div className="flex items-center gap-3 mb-3 text-xs">
           {streak > 0 && (
             <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 font-semibold">
               <Flame size={12} className="fill-amber-500 dark:fill-amber-400" />
@@ -132,25 +174,32 @@ export function HabitCard({ habit }: HabitCardProps) {
 
         {/* Weekly Tracker */}
         {!isComplete && (
-          <div className="mb-4">
-            <WeeklyTracker habitId={habit.id} completedDates={habit.completedDates} missedDates={habit.missedDates} createdAt={habit.createdAt} />
-          </div>
+          <WeeklyTracker habitId={habit.id} completedDates={habit.completedDates} missedDates={habit.missedDates} createdAt={habit.createdAt} />
         )}
 
-        {/* Action buttons — using ActionButton for consistency & touch-friendly sizing */}
+        {/* Action area */}
         {!isComplete && (
-          <div className="flex gap-2">
+          <div className="mt-3">
             {alreadyTrackedToday ? (
-              <div
-                className={`flex-1 flex items-center justify-center min-h-[44px] py-2.5 rounded-xl text-center text-sm font-medium gap-1.5 box-border ${completedToday
-                  ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-500/15"
-                  : "bg-red-50 dark:bg-red-500/10 text-red-500 dark:text-red-400 border border-red-200/60 dark:border-red-500/15"
-                  }`}
-              >
-                {completedToday ? <><Check size={16} strokeWidth={2.5} /> Selesai</> : <><X size={16} strokeWidth={2.5} /> Terlewat</>}
+              /* Subtle status + undo — no big buttons */
+              <div className="flex items-center justify-between">
+                <div className={`flex items-center gap-1.5 text-sm font-medium ${completedToday
+                  ? "text-emerald-600 dark:text-emerald-400"
+                  : "text-red-500 dark:text-red-400"
+                  }`}>
+                  {completedToday ? <Check size={15} strokeWidth={2.5} /> : <X size={15} strokeWidth={2.5} />}
+                  {completedToday ? "Selesai hari ini" : "Terlewat hari ini"}
+                </div>
+                <button
+                  onClick={handleUndo}
+                  className="flex items-center gap-1 text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors cursor-pointer"
+                >
+                  <Undo2 size={12} />
+                  Batalkan
+                </button>
               </div>
             ) : (
-              <>
+              <div className="flex gap-2">
                 <ActionButton
                   variant="success"
                   onClick={handleComplete}
@@ -167,7 +216,7 @@ export function HabitCard({ habit }: HabitCardProps) {
                   <X size={16} strokeWidth={2.5} />
                   Terlewat
                 </ActionButton>
-              </>
+              </div>
             )}
           </div>
         )}
