@@ -1,7 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import {
   Activity, BookOpen, Brain, Briefcase, Dumbbell, Flame,
-  Heart, Laptop, Moon, Mountain, Music, Pencil, Droplets,
+  Heart, Laptop, Moon, Mountain, Pencil, Droplets,
   PersonStanding, Salad, Shield, Sparkles, CircleOff, Timer,
   Target, Zap, Sun, Coffee, Bike, Eye, Footprints,
 } from "lucide-react";
@@ -30,7 +30,6 @@ export const HABIT_ICONS: HabitIconOption[] = [
   { name: "moon", icon: Moon, label: "Tidur" },
   { name: "sun", icon: Sun, label: "Pagi" },
   { name: "coffee", icon: Coffee, label: "Kopi" },
-  { name: "music", icon: Music, label: "Musik" },
   { name: "mountain", icon: Mountain, label: "Outdoor" },
   { name: "shield", icon: Shield, label: "NoFap" },
   { name: "no-smoking", icon: CircleOff, label: "Berhenti" },
