@@ -38,6 +38,7 @@ export default function HabitDetail({ params }: Route.ComponentProps) {
   const [editName, setEditName] = useState("");
   const [editIcon, setEditIcon] = useState("");
   const [showDangerZone, setShowDangerZone] = useState(false);
+  const today = useToday();
 
   if (!habit) {
     return (
@@ -53,7 +54,6 @@ export default function HabitDetail({ params }: Route.ComponentProps) {
     );
   }
 
-  const today = useToday();
   const alreadyTrackedToday =
     habit.completedDates.includes(today) || habit.missedDates.includes(today);
   const completedToday = habit.completedDates.includes(today);
