@@ -14,8 +14,8 @@ const TEMPLATES = [
   { text: "Olahraga 30 menit", icon: "dumbbell", color: "emerald" },
   { text: "Membaca 30 halaman", icon: "book-open", color: "blue" },
   { text: "Jogging 5 km", icon: "running", color: "orange" },
-  { text: "Push-up 50 kali", icon: "dumbbell", color: "rose" },
-  { text: "Menulis 500 kata", icon: "pencil", color: "cyan" },
+  { text: "Push-up 50 kali", icon: "dumbbell", color: "red" },
+  { text: "Menulis 500 kata", icon: "pencil", color: "amber" },
 ];
 
 // Regex: extract activity name, target number, and unit

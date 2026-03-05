@@ -3,7 +3,6 @@ import type { Habit } from "~/store/useHabitStore";
 import { useHabitStore, getStreak } from "~/store/useHabitStore";
 import { useToastStore } from "~/store/useToastStore";
 import { LivesIndicator } from "./LivesIndicator";
-import { WeeklyTracker } from "./WeeklyTracker";
 import { ActionButton } from "./ui/ActionButton";
 import { Check, X, Flame, ChevronRight, Trophy, Undo2 } from "lucide-react";
 import { useToday } from "~/store/useDevStore";
@@ -35,6 +34,10 @@ export function HabitCard({ habit }: HabitCardProps) {
   const totalDaysTracked = habit.completedDates.length + habit.missedDates.length;
   const successRate = totalDaysTracked > 0
     ? Math.round((habit.completedDates.length / totalDaysTracked) * 100)
+    : 0;
+
+  const stageProgress = currentStage
+    ? Math.min(100, (habit.currentStageProgress / currentStage.targetDays) * 100)
     : 0;
 
   const IconComponent = getHabitIcon(habit.icon);
@@ -107,98 +110,85 @@ export function HabitCard({ habit }: HabitCardProps) {
 
   return (
     <div className="relative group bg-white dark:bg-zinc-900/80 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden transition-all duration-300 hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-lg hover:shadow-black/5 dark:hover:shadow-black/20">
-
-      <div className="p-5">
-        {/* Header: icon + info + link arrow */}
+      <div className="p-4 sm:p-5">
+        {/* Header row: icon + name + meta + arrow */}
         <Link
           to={`/kebiasaan/${habit.id}`}
-          className="flex items-center gap-3 mb-3 group/link"
+          className="flex items-center gap-3 group/link"
         >
-          {/* Icon container — Lucide icon with custom color */}
-          <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-colors ${colorTheme.bg}`}>
-            <IconComponent size={22} className={colorTheme.text} />
+          <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${colorTheme.bg}`}>
+            <IconComponent size={20} className={colorTheme.text} />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-zinc-900 dark:text-zinc-100 text-base leading-tight truncate">
+            <h3 className="font-bold text-zinc-900 dark:text-zinc-100 text-[15px] leading-tight truncate">
               {habit.name}
             </h3>
-            <p className="text-xs text-zinc-500 mt-0.5 truncate">
-              {isComplete ? (
-                <span className="text-emerald-600 dark:text-emerald-400 font-semibold inline-flex items-center gap-1">
-                  <Trophy size={11} /> Target tercapai!
-                </span>
-              ) : currentStage ? (
-                <>Hari ini: {currentStage.label}</>
-              ) : null}
-            </p>
+            {isComplete ? (
+              <span className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold inline-flex items-center gap-1 mt-0.5">
+                <Trophy size={11} /> Target tercapai!
+              </span>
+            ) : currentStage ? (
+              <span className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5 block truncate">
+                Tahap {habit.currentStageIndex + 1}/{habit.stages.length} · {currentStage.label}
+              </span>
+            ) : null}
           </div>
-          <ChevronRight size={16} className="text-zinc-400 dark:text-zinc-600 shrink-0 transition-transform group-hover/link:translate-x-0.5" />
+          <ChevronRight size={16} className="text-zinc-300 dark:text-zinc-700 shrink-0 transition-transform group-hover/link:translate-x-0.5" />
         </Link>
 
-        {/* Current stage info */}
+        {/* Stage progress — flat inline style */}
         {!isComplete && currentStage && (
-          <div className={`mb-3 px-3 py-2.5 rounded-xl border ${colorTheme.light}`}>
-            <div className="flex items-center justify-between mb-1.5">
-              <div className="flex items-center gap-1.5">
-                <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${colorTheme.bg} ${colorTheme.text}`}>
-                  Tahap {habit.currentStageIndex + 1}/{habit.stages.length}
-                </span>
-                <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">
-                  {currentStage.label}
-                </span>
-              </div>
-              <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 tabular-nums">
-                {habit.currentStageProgress}/{currentStage.targetDays}
+          <div className="mt-3">
+            <div className="flex items-center justify-between mb-1">
+              <span className={`text-[11px] font-semibold ${colorTheme.text}`}>
+                {habit.currentStageProgress}/{currentStage.targetDays} hari
+              </span>
+              <span className="text-[11px] text-zinc-400 dark:text-zinc-600 tabular-nums">
+                {Math.round(stageProgress)}%
               </span>
             </div>
-            <div className="h-1.5 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
+            <div className="h-2 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
               <div
-                className={`h-full rounded-full transition-all duration-500 ${colorTheme.bg}`}
-                style={{ width: `${Math.min(100, (habit.currentStageProgress / currentStage.targetDays) * 100)}%` }}
+                className={`h-full rounded-full transition-all duration-500 ${colorTheme.dot}`}
+                style={{ width: `${stageProgress}%` }}
               />
             </div>
           </div>
         )}
 
-        {/* Stats row */}
-        <div className="flex items-center gap-3 mb-3 text-xs">
+        {/* Meta chips — compact row */}
+        <div className="flex items-center gap-2 mt-3 flex-wrap">
           {streak > 0 && (
-            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 font-semibold">
-              <Flame size={12} className="fill-amber-500 dark:fill-amber-400" />
+            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[11px] font-semibold">
+              <Flame size={11} className="fill-amber-500 dark:fill-amber-400" />
               {streak}
             </span>
           )}
           <LivesIndicator lives={habit.lives} maxLives={habit.maxLives} />
           {totalDaysTracked > 0 && (
-            <span className="text-zinc-400 dark:text-zinc-600 ml-auto tabular-nums">
-              {successRate}% sukses
+            <span className="text-[11px] text-zinc-400 dark:text-zinc-600 ml-auto tabular-nums">
+              {successRate}%
             </span>
           )}
         </div>
-
-        {/* Weekly Tracker */}
-        {!isComplete && (
-          <WeeklyTracker habitId={habit.id} completedDates={habit.completedDates} missedDates={habit.missedDates} createdAt={habit.createdAt} />
-        )}
 
         {/* Action area */}
         {!isComplete && (
           <div className="mt-3">
             {alreadyTrackedToday ? (
-              /* Subtle status + undo */
               <div className="flex items-center justify-between">
-                <div className={`flex items-center gap-1.5 text-sm font-medium ${completedToday
+                <span className={`inline-flex items-center gap-1.5 text-sm font-medium ${completedToday
                   ? "text-emerald-600 dark:text-emerald-400"
                   : "text-red-500 dark:text-red-400"
                   }`}>
                   {completedToday ? <Check size={15} strokeWidth={2.5} /> : <X size={15} strokeWidth={2.5} />}
-                  {completedToday ? "Selesai hari ini" : "Terlewat hari ini"}
-                </div>
+                  {completedToday ? "Selesai" : "Terlewat"}
+                </span>
                 <button
                   onClick={handleUndo}
-                  className="flex items-center gap-1 text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors cursor-pointer px-2 py-1 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                  className="flex items-center gap-1 text-[11px] text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors cursor-pointer px-2 py-1 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800"
                 >
-                  <Undo2 size={12} />
+                  <Undo2 size={11} />
                   Batalkan
                 </button>
               </div>
@@ -208,30 +198,22 @@ export function HabitCard({ habit }: HabitCardProps) {
                   variant="success"
                   onClick={handleComplete}
                   className="flex-1"
+                  size="sm"
                 >
-                  <Check size={16} strokeWidth={2.5} />
+                  <Check size={15} strokeWidth={2.5} />
                   Selesai
                 </ActionButton>
                 <ActionButton
                   variant="ghost"
                   onClick={handleMissed}
                   className="flex-1"
+                  size="sm"
                 >
-                  <X size={16} strokeWidth={2.5} />
+                  <X size={15} strokeWidth={2.5} />
                   Terlewat
                 </ActionButton>
               </div>
             )}
-          </div>
-        )}
-
-        {/* Completed state */}
-        {isComplete && (
-          <div className="flex items-center gap-2 py-2 px-3 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200/60 dark:border-emerald-500/15">
-            <Trophy size={16} className="text-emerald-500 shrink-0" />
-            <span className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
-              Selamat! Target tercapai!
-            </span>
           </div>
         )}
       </div>
