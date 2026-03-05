@@ -9,7 +9,7 @@ export function meta() {
 
 export default function CreatePage() {
   return (
-    <PageShell title="Kebiasaan Baru" backTo="/" maxWidth="sm">
+    <PageShell title="Kebiasaan Baru" backTo="/">
       <CreateHabitForm />
     </PageShell>
   );

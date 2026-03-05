@@ -41,7 +41,7 @@ export default function HabitDetail({ params }: Route.ComponentProps) {
 
   if (!habit) {
     return (
-      <PageShell title="Tidak Ditemukan" backTo="/" maxWidth="md">
+      <PageShell title="Tidak Ditemukan" backTo="/">
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <Search size={48} className="text-zinc-300 dark:text-zinc-700 mx-auto mb-4" />
           <p className="text-zinc-500 dark:text-zinc-400 mb-4">Kebiasaan tidak ditemukan</p>
@@ -160,7 +160,6 @@ export default function HabitDetail({ params }: Route.ComponentProps) {
     <PageShell
       title={`${habit.icon} ${habit.name}`}
       backTo="/"
-      maxWidth="md"
       headerRight={
         <IconButton icon={Pencil} onClick={startEditing} title="Edit" />
       }
