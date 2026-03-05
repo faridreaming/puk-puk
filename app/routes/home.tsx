@@ -9,7 +9,7 @@ import { PageShell } from "~/components/ui/PageShell";
 import { Plus } from "lucide-react";
 export function meta({ }: Route.MetaArgs) {
   return [
-    { title: "Puk-Puk - Bangun Kebiasaan Perlahan" },
+    { title: "Pukpuk - Bangun Kebiasaan Perlahan" },
     { name: "description", content: "Aplikasi habit tracker yang mendukung perubahan bertahap" },
   ];
 }
@@ -19,7 +19,7 @@ export default function Home() {
 
   return (
     <PageShell
-      title="🐣 Puk-Puk"
+      title="🐣 Pukpuk"
       subtitle="Perlahan, tapi pasti."
       headerRight={
         <>

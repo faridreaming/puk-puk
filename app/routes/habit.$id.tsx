@@ -19,7 +19,7 @@ import { HABIT_ICONS, HABIT_COLORS, getHabitIcon, getHabitColor } from "~/lib/ha
 
 export function meta({ params }: Route.MetaArgs) {
   return [
-    { title: `Detail Kebiasaan - Puk-Puk 🐣` },
+    { title: `Detail Kebiasaan - Pukpuk 🐣` },
   ];
 }
 

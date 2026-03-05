@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "puk-puk",
+      "name": "pukpuk",
       "dependencies": {
         "@react-router/node": "7.12.0",
         "@react-router/serve": "7.12.0",
