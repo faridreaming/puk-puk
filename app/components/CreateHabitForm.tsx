@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router";
 import { useHabitStore } from "~/store/useHabitStore";
+import { HABIT_ICONS, HABIT_COLORS, getHabitIcon, getHabitColor } from "~/lib/habitMeta";
 import { Lightbulb, Check, Flag, Rocket, Heart, Plus, X, CopyPlus, Info, Trash2, Settings2, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
 
 interface StageInput {
@@ -9,15 +10,13 @@ interface StageInput {
 }
 
 const TEMPLATES = [
-  { text: "Meditasi 30 menit", icon: "🧘" },
-  { text: "Olahraga 30 menit", icon: "🏃" },
-  { text: "Membaca 30 halaman", icon: "📚" },
-  { text: "Jogging 5 km", icon: "🏃" },
-  { text: "Push-up 50 kali", icon: "💪" },
-  { text: "Menulis 500 kata", icon: "✍️" },
+  { text: "Meditasi 30 menit", icon: "brain", color: "violet" },
+  { text: "Olahraga 30 menit", icon: "dumbbell", color: "emerald" },
+  { text: "Membaca 30 halaman", icon: "book-open", color: "blue" },
+  { text: "Jogging 5 km", icon: "running", color: "orange" },
+  { text: "Push-up 50 kali", icon: "dumbbell", color: "rose" },
+  { text: "Menulis 500 kata", icon: "pencil", color: "cyan" },
 ];
-
-const EMOJI_OPTIONS = ["🧘", "🏃", "📚", "💪", "🎯", "✍️", "🥗", "💤", "🧹", "💻", "🚫"];
 
 // Regex: extract activity name, target number, and unit
 // e.g. "Meditasi 30 menit" → ["Meditasi", "30", "menit"]
@@ -68,7 +67,8 @@ export function CreateHabitForm() {
   const navigate = useNavigate();
 
   const [input, setInput] = useState("");
-  const [icon, setIcon] = useState("🎯");
+  const [icon, setIcon] = useState("target");
+  const [color, setColor] = useState("amber");
   const [maxLives, setMaxLives] = useState(3);
   const [manualStages, setManualStages] = useState<StageInput[] | null>(null);
   const [showTemplates, setShowTemplates] = useState(false);
@@ -96,7 +96,8 @@ export function CreateHabitForm() {
   const applyTemplate = (template: (typeof TEMPLATES)[0]) => {
     setInput(template.text);
     setIcon(template.icon);
-    setManualStages(null); // Reset to auto-generate
+    setColor(template.color);
+    setManualStages(null);
   };
 
   const updateStage = (index: number, field: keyof StageInput, value: string) => {
@@ -125,6 +126,7 @@ export function CreateHabitForm() {
     addHabit({
       name: input.trim(),
       icon,
+      color,
       targetLabel: input.trim(),
       maxLives,
       stages: stages.map((s, i) => ({
@@ -166,46 +168,82 @@ export function CreateHabitForm() {
         >
           <div className="overflow-hidden">
             <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 pt-1 pb-2">
-              {TEMPLATES.map((t) => (
-                <button
-                  key={t.text}
-                  type="button"
-                  onClick={() => {
-                    applyTemplate(t);
-                    setShowTemplates(false);
-                  }}
-                  // Prevent tabbing to hidden elements
-                  tabIndex={showTemplates ? 0 : -1}
-                  className="p-3 rounded-xl bg-zinc-100 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/50 hover:border-zinc-300 dark:hover:border-zinc-600 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all duration-200 text-center cursor-pointer flex flex-col items-center justify-center gap-2"
-                >
-                  <span className="text-2xl leading-none">{t.icon}</span>
-                  <span className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-tight text-center">{t.text}</span>
-                </button>
-              ))}
+              {TEMPLATES.map((t) => {
+                const TemplateIcon = getHabitIcon(t.icon);
+                const templateColor = getHabitColor(t.color);
+                return (
+                  <button
+                    key={t.text}
+                    type="button"
+                    onClick={() => {
+                      applyTemplate(t);
+                      setShowTemplates(false);
+                    }}
+                    tabIndex={showTemplates ? 0 : -1}
+                    className="p-3 rounded-xl bg-zinc-100 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/50 hover:border-zinc-300 dark:hover:border-zinc-600 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all duration-200 text-center cursor-pointer flex flex-col items-center justify-center gap-2"
+                  >
+                    <TemplateIcon size={22} className={templateColor.text} />
+                    <span className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-tight text-center">{t.text}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Emoji picker */}
-      <div>
-        <label className="block text-sm font-semibold text-zinc-500 dark:text-zinc-400 mb-2">
-          Ikon
-        </label>
-        <div className="flex flex-wrap gap-2">
-          {EMOJI_OPTIONS.map((emoji) => (
-            <button
-              key={emoji}
-              type="button"
-              onClick={() => setIcon(emoji)}
-              className={`w-10 h-10 rounded-lg text-xl flex items-center justify-center transition-all duration-200 cursor-pointer ${icon === emoji
-                ? "bg-amber-100 dark:bg-amber-500/20 ring-2 ring-amber-500 scale-110"
-                : "bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700"
-                }`}
-            >
-              {emoji}
-            </button>
-          ))}
+      {/* Icon + Color picker */}
+      <div className="space-y-4">
+        {/* Icon picker */}
+        <div>
+          <label className="block text-sm font-semibold text-zinc-500 dark:text-zinc-400 mb-2">
+            Ikon
+          </label>
+          <div className="flex flex-wrap gap-1.5">
+            {HABIT_ICONS.map((opt) => {
+              const IconComp = opt.icon;
+              const isSelected = icon === opt.name;
+              const selectedColor = getHabitColor(color);
+              return (
+                <button
+                  key={opt.name}
+                  type="button"
+                  onClick={() => setIcon(opt.name)}
+                  title={opt.label}
+                  className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-200 cursor-pointer ${isSelected
+                    ? `${selectedColor.bg} ring-2 ${selectedColor.ring} scale-110`
+                    : "bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-500 dark:text-zinc-400"
+                    }`}
+                >
+                  <IconComp size={18} className={isSelected ? selectedColor.text : ""} />
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Color picker */}
+        <div>
+          <label className="block text-sm font-semibold text-zinc-500 dark:text-zinc-400 mb-2">
+            Warna
+          </label>
+          <div className="flex flex-wrap gap-2.5">
+            {HABIT_COLORS.map((c) => {
+              const isSelected = color === c.name;
+              return (
+                <button
+                  key={c.name}
+                  type="button"
+                  onClick={() => setColor(c.name)}
+                  title={c.label}
+                  className={`w-8 h-8 rounded-full transition-all duration-200 cursor-pointer ${c.dot} ${isSelected
+                    ? "ring-2 ring-offset-2 ring-offset-white dark:ring-offset-zinc-900 " + c.ring + " scale-110"
+                    : "hover:scale-110 opacity-80 hover:opacity-100"
+                    }`}
+                />
+              );
+            })}
+          </div>
         </div>
       </div>
 

@@ -8,6 +8,7 @@ import { ActionButton } from "./ui/ActionButton";
 import { Check, X, Flame, ChevronRight, Trophy, Undo2 } from "lucide-react";
 import { useToday } from "~/store/useDevStore";
 import { useDialogStore } from "~/store/useDialogStore";
+import { getHabitIcon, getHabitColor } from "~/lib/habitMeta";
 
 interface HabitCardProps {
   habit: Habit;
@@ -35,6 +36,9 @@ export function HabitCard({ habit }: HabitCardProps) {
   const successRate = totalDaysTracked > 0
     ? Math.round((habit.completedDates.length / totalDaysTracked) * 100)
     : 0;
+
+  const IconComponent = getHabitIcon(habit.icon);
+  const colorTheme = getHabitColor(habit.color || "amber");
 
   const handleComplete = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -110,9 +114,9 @@ export function HabitCard({ habit }: HabitCardProps) {
           to={`/kebiasaan/${habit.id}`}
           className="flex items-center gap-3 mb-3 group/link"
         >
-          {/* Icon container */}
-          <div className="w-12 h-12 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-2xl shrink-0 transition-colors group-hover/link:bg-zinc-200 dark:group-hover/link:bg-zinc-700">
-            {habit.icon}
+          {/* Icon container — Lucide icon with custom color */}
+          <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-colors ${colorTheme.bg}`}>
+            <IconComponent size={22} className={colorTheme.text} />
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="font-bold text-zinc-900 dark:text-zinc-100 text-base leading-tight truncate">
@@ -131,12 +135,12 @@ export function HabitCard({ habit }: HabitCardProps) {
           <ChevronRight size={16} className="text-zinc-400 dark:text-zinc-600 shrink-0 transition-transform group-hover/link:translate-x-0.5" />
         </Link>
 
-        {/* Current stage info — what to do TODAY */}
+        {/* Current stage info */}
         {!isComplete && currentStage && (
-          <div className="mb-3 px-3 py-2.5 rounded-xl bg-amber-50/80 dark:bg-amber-500/8 border border-amber-200/40 dark:border-amber-500/10">
+          <div className={`mb-3 px-3 py-2.5 rounded-xl border ${colorTheme.light}`}>
             <div className="flex items-center justify-between mb-1.5">
               <div className="flex items-center gap-1.5">
-                <span className="px-1.5 py-0.5 rounded bg-amber-200/60 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 text-[10px] font-bold">
+                <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${colorTheme.bg} ${colorTheme.text}`}>
                   Tahap {habit.currentStageIndex + 1}/{habit.stages.length}
                 </span>
                 <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">
@@ -147,9 +151,9 @@ export function HabitCard({ habit }: HabitCardProps) {
                 {habit.currentStageProgress}/{currentStage.targetDays}
               </span>
             </div>
-            <div className="h-1.5 bg-amber-200/40 dark:bg-amber-500/10 rounded-full overflow-hidden">
+            <div className="h-1.5 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
               <div
-                className="h-full bg-amber-500 rounded-full transition-all duration-500"
+                className={`h-full rounded-full transition-all duration-500 ${colorTheme.bg}`}
                 style={{ width: `${Math.min(100, (habit.currentStageProgress / currentStage.targetDays) * 100)}%` }}
               />
             </div>
@@ -181,7 +185,7 @@ export function HabitCard({ habit }: HabitCardProps) {
         {!isComplete && (
           <div className="mt-3">
             {alreadyTrackedToday ? (
-              /* Subtle status + undo — no big buttons */
+              /* Subtle status + undo */
               <div className="flex items-center justify-between">
                 <div className={`flex items-center gap-1.5 text-sm font-medium ${completedToday
                   ? "text-emerald-600 dark:text-emerald-400"
@@ -192,7 +196,7 @@ export function HabitCard({ habit }: HabitCardProps) {
                 </div>
                 <button
                   onClick={handleUndo}
-                  className="flex items-center gap-1 text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors cursor-pointer"
+                  className="flex items-center gap-1 text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors cursor-pointer px-2 py-1 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800"
                 >
                   <Undo2 size={12} />
                   Batalkan

@@ -14,6 +14,7 @@ export interface Habit {
   id: string;
   name: string;
   icon: string;
+  color: string;
   targetLabel: string;
   stages: HabitStage[];
   currentStageIndex: number;
@@ -35,10 +36,11 @@ export type ActionResult =
 interface HabitStore {
   habits: Habit[];
   addHabit: (data: Omit<Habit, "id" | "lives" | "completedDates" | "missedDates" | "currentStageProgress" | "createdAt" | "currentStageIndex">) => void;
+
   markComplete: (habitId: string, date: string) => ActionResult;
   markMissed: (habitId: string, date: string) => ActionResult;
   undoToday: (habitId: string, date: string) => ActionResult;
-  editHabit: (habitId: string, data: { name?: string; icon?: string; targetLabel?: string; maxLives?: number }) => void;
+  editHabit: (habitId: string, data: { name?: string; icon?: string; color?: string; targetLabel?: string; maxLives?: number }) => void;
   deleteHabit: (habitId: string) => void;
   resetHabit: (habitId: string) => void;
   exportData: () => string;
@@ -88,6 +90,7 @@ export const useHabitStore = create<HabitStore>()(
         const newHabit: Habit = {
           ...data,
           id: generateId(),
+          color: data.color || "amber",
           currentStageIndex: 0,
           lives: data.maxLives,
           completedDates: [],
@@ -211,6 +214,7 @@ export const useHabitStore = create<HabitStore>()(
                 ...habit,
                 ...(data.name !== undefined && { name: data.name }),
                 ...(data.icon !== undefined && { icon: data.icon }),
+                ...(data.color !== undefined && { color: data.color }),
                 ...(data.targetLabel !== undefined && { targetLabel: data.targetLabel }),
                 ...(data.maxLives !== undefined && {
                   maxLives: data.maxLives,

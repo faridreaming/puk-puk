@@ -15,6 +15,7 @@ import type { Route } from "./+types/habit.$id";
 import { useState } from "react";
 import { Pencil, Check, X, Undo2, Flame, RotateCcw, Trash2, Search, ChevronDown } from "lucide-react";
 import { useToday } from "~/store/useDevStore";
+import { HABIT_ICONS, HABIT_COLORS, getHabitIcon, getHabitColor } from "~/lib/habitMeta";
 
 export function meta({ params }: Route.MetaArgs) {
   return [
@@ -37,6 +38,7 @@ export default function HabitDetail({ params }: Route.ComponentProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState("");
   const [editIcon, setEditIcon] = useState("");
+  const [editColor, setEditColor] = useState("");
   const [showDangerZone, setShowDangerZone] = useState(false);
   const today = useToday();
 
@@ -143,22 +145,24 @@ export default function HabitDetail({ params }: Route.ComponentProps) {
   const startEditing = () => {
     setEditName(habit.name);
     setEditIcon(habit.icon);
+    setEditColor(habit.color || "amber");
     setIsEditing(true);
   };
 
   const saveEdit = () => {
     if (editName.trim()) {
-      editHabit(habit.id, { name: editName.trim(), icon: editIcon, targetLabel: editName.trim() });
+      editHabit(habit.id, { name: editName.trim(), icon: editIcon, color: editColor, targetLabel: editName.trim() });
       addToast({ message: "Tersimpan", type: "success", duration: 2000 });
     }
     setIsEditing(false);
   };
 
-  const EMOJI_OPTIONS = ["🧘", "🏃", "📚", "💪", "🎯", "✍️", "🥗", "💤", "🧹", "💻", "🚫"];
+  const HabitIcon = getHabitIcon(habit.icon);
+  const habitColor = getHabitColor(habit.color || "amber");
 
   return (
     <PageShell
-      title={`${habit.icon} ${habit.name}`}
+      title={habit.name}
       backTo="/"
       headerRight={
         <IconButton icon={Pencil} onClick={startEditing} title="Edit" />
@@ -169,20 +173,47 @@ export default function HabitDetail({ params }: Route.ComponentProps) {
         {isEditing && (
           <Section className="border-amber-300 dark:border-amber-500/20">
             <h3 className="text-sm font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider mb-4">Edit Kebiasaan</h3>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {EMOJI_OPTIONS.map((emoji) => (
-                <button
-                  key={emoji}
-                  type="button"
-                  onClick={() => setEditIcon(emoji)}
-                  className={`w-9 h-9 rounded-lg text-lg flex items-center justify-center transition-all cursor-pointer ${editIcon === emoji
-                    ? "bg-amber-100 dark:bg-amber-500/20 ring-2 ring-amber-500 scale-110"
-                    : "bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700"
-                    }`}
-                >
-                  {emoji}
-                </button>
-              ))}
+            {/* Icon picker */}
+            <label className="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">Ikon</label>
+            <div className="flex flex-wrap gap-1.5 mb-3">
+              {HABIT_ICONS.map((opt) => {
+                const IconComp = opt.icon;
+                const isSelected = editIcon === opt.name;
+                const selColor = getHabitColor(editColor);
+                return (
+                  <button
+                    key={opt.name}
+                    type="button"
+                    onClick={() => setEditIcon(opt.name)}
+                    title={opt.label}
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all cursor-pointer ${isSelected
+                      ? `${selColor.bg} ring-2 ${selColor.ring} scale-110`
+                      : "bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-500 dark:text-zinc-400"
+                      }`}
+                  >
+                    <IconComp size={16} className={isSelected ? selColor.text : ""} />
+                  </button>
+                );
+              })}
+            </div>
+            {/* Color picker */}
+            <label className="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">Warna</label>
+            <div className="flex flex-wrap gap-2.5 mb-4">
+              {HABIT_COLORS.map((c) => {
+                const isSelected = editColor === c.name;
+                return (
+                  <button
+                    key={c.name}
+                    type="button"
+                    onClick={() => setEditColor(c.name)}
+                    title={c.label}
+                    className={`w-7 h-7 rounded-full transition-all cursor-pointer ${c.dot} ${isSelected
+                      ? "ring-2 ring-offset-2 ring-offset-white dark:ring-offset-zinc-900 " + c.ring + " scale-110"
+                      : "hover:scale-110 opacity-80 hover:opacity-100"
+                      }`}
+                  />
+                );
+              })}
             </div>
             <input
               type="text"
