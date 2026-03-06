@@ -4,7 +4,9 @@ import { Plus, ArrowRight } from "lucide-react";
 export function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
-      <div className="text-7xl mb-6 animate-bounce">🐣</div>
+      <div className="mb-6 animate-bounce">
+        <img src="/logo.svg" alt="Pukpuk" className="w-20 h-20 drop-shadow-md mx-auto" />
+      </div>
       <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-3">
         Belum ada kebiasaan
       </h2>

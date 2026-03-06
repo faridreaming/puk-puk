@@ -2,7 +2,7 @@ import { Link } from "react-router";
 import { ChevronLeft } from "lucide-react";
 
 interface PageShellProps {
-  title: string;
+  title: React.ReactNode;
   subtitle?: string;
   backTo?: string;
   headerRight?: React.ReactNode;

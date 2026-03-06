@@ -19,7 +19,12 @@ export default function Home() {
 
   return (
     <PageShell
-      title="🐣 Pukpuk"
+      title={
+        <div className="flex items-center gap-2">
+          <img src="/logo.svg" alt="Pukpuk Logo" className="w-7 h-7 drop-shadow-sm" />
+          <span>Pukpuk</span>
+        </div>
+      }
       subtitle="Perlahan, tapi pasti."
       headerRight={
         <>
@@ -37,18 +42,20 @@ export default function Home() {
         </>
       }
     >
-      {habits.length === 0 ? (
-        <EmptyState />
-      ) : (
-        <>
-          {/* Desktop: data manager already in header */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {habits.map((habit) => (
-              <HabitCard key={habit.id} habit={habit} />
-            ))}
-          </div>
-        </>
-      )}
-    </PageShell>
+      {
+        habits.length === 0 ? (
+          <EmptyState />
+        ) : (
+          <>
+            {/* Desktop: data manager already in header */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {habits.map((habit) => (
+                <HabitCard key={habit.id} habit={habit} />
+              ))}
+            </div>
+          </>
+        )
+      }
+    </PageShell >
   );
 }

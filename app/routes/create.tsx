@@ -3,7 +3,7 @@ import { PageShell } from "~/components/ui/PageShell";
 
 export function meta() {
   return [
-    { title: "Buat Kebiasaan Baru - Pukpuk 🐣" },
+    { title: "Buat Kebiasaan Baru - Pukpuk" },
   ];
 }
 
