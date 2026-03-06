@@ -56,6 +56,7 @@ export interface HabitColorOption {
   ring: string;      // selected ring
   light: string;     // lighter bg for cards/badges
   dot: string;       // solid fill for color swatch circle
+  border: string;    // border color
 }
 
 export const HABIT_COLORS: HabitColorOption[] = [
@@ -67,6 +68,7 @@ export const HABIT_COLORS: HabitColorOption[] = [
     ring: "ring-zinc-500",
     light: "bg-zinc-100/80 dark:bg-zinc-800/50 border-zinc-200/40 dark:border-zinc-700/30",
     dot: "bg-zinc-800 dark:bg-zinc-300",
+    border: "border-zinc-400 dark:border-zinc-500",
   },
   {
     name: "red",
@@ -76,6 +78,7 @@ export const HABIT_COLORS: HabitColorOption[] = [
     ring: "ring-red-500",
     light: "bg-red-50/80 dark:bg-red-500/8 border-red-200/40 dark:border-red-500/10",
     dot: "bg-red-500",
+    border: "border-red-300 dark:border-red-500/40",
   },
   {
     name: "orange",
@@ -85,6 +88,7 @@ export const HABIT_COLORS: HabitColorOption[] = [
     ring: "ring-orange-500",
     light: "bg-orange-50/80 dark:bg-orange-500/8 border-orange-200/40 dark:border-orange-500/10",
     dot: "bg-orange-500",
+    border: "border-orange-300 dark:border-orange-500/40",
   },
   {
     name: "amber",
@@ -94,6 +98,7 @@ export const HABIT_COLORS: HabitColorOption[] = [
     ring: "ring-amber-500",
     light: "bg-amber-50/80 dark:bg-amber-500/8 border-amber-200/40 dark:border-amber-500/10",
     dot: "bg-amber-500",
+    border: "border-amber-300 dark:border-amber-500/40",
   },
   {
     name: "emerald",
@@ -103,6 +108,7 @@ export const HABIT_COLORS: HabitColorOption[] = [
     ring: "ring-emerald-500",
     light: "bg-emerald-50/80 dark:bg-emerald-500/8 border-emerald-200/40 dark:border-emerald-500/10",
     dot: "bg-emerald-500",
+    border: "border-emerald-300 dark:border-emerald-500/40",
   },
   {
     name: "blue",
@@ -112,6 +118,7 @@ export const HABIT_COLORS: HabitColorOption[] = [
     ring: "ring-blue-500",
     light: "bg-blue-50/80 dark:bg-blue-500/8 border-blue-200/40 dark:border-blue-500/10",
     dot: "bg-blue-500",
+    border: "border-blue-300 dark:border-blue-500/40",
   },
   {
     name: "violet",
@@ -121,6 +128,7 @@ export const HABIT_COLORS: HabitColorOption[] = [
     ring: "ring-violet-500",
     light: "bg-violet-50/80 dark:bg-violet-500/8 border-violet-200/40 dark:border-violet-500/10",
     dot: "bg-violet-500",
+    border: "border-violet-300 dark:border-violet-500/40",
   },
   {
     name: "pink",
@@ -130,6 +138,7 @@ export const HABIT_COLORS: HabitColorOption[] = [
     ring: "ring-pink-500",
     light: "bg-pink-50/80 dark:bg-pink-500/8 border-pink-200/40 dark:border-pink-500/10",
     dot: "bg-pink-500",
+    border: "border-pink-300 dark:border-pink-500/40",
   },
 ];
 

@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router";
 import { useHabitStore } from "~/store/useHabitStore";
 import { HABIT_ICONS, HABIT_COLORS, getHabitIcon, getHabitColor } from "~/lib/habitMeta";
+import { IconColorPicker } from "~/components/IconColorPicker";
 import { Lightbulb, Check, Flag, Rocket, Heart, Plus, X, CopyPlus, Info, Trash2, Settings2, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
 
 interface StageInput {
@@ -191,78 +192,25 @@ export function CreateHabitForm() {
           </div>
         </div>
       </div>
-
-      {/* Icon + Color picker */}
-      <div className="space-y-4">
-        {/* Icon picker */}
-        <div>
-          <label className="block text-sm font-semibold text-zinc-500 dark:text-zinc-400 mb-2">
-            Ikon
-          </label>
-          <div className="flex flex-wrap gap-1.5">
-            {HABIT_ICONS.map((opt) => {
-              const IconComp = opt.icon;
-              const isSelected = icon === opt.name;
-              const selectedColor = getHabitColor(color);
-              return (
-                <button
-                  key={opt.name}
-                  type="button"
-                  onClick={() => setIcon(opt.name)}
-                  title={opt.label}
-                  className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-200 cursor-pointer ${isSelected
-                    ? `${selectedColor.bg} ring-2 ${selectedColor.ring} scale-110`
-                    : "bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-500 dark:text-zinc-400"
-                    }`}
-                >
-                  <IconComp size={18} className={isSelected ? selectedColor.text : ""} />
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Color picker */}
-        <div>
-          <label className="block text-sm font-semibold text-zinc-500 dark:text-zinc-400 mb-2">
-            Warna
-          </label>
-          <div className="flex flex-wrap gap-2.5">
-            {HABIT_COLORS.map((c) => {
-              const isSelected = color === c.name;
-              return (
-                <button
-                  key={c.name}
-                  type="button"
-                  onClick={() => setColor(c.name)}
-                  title={c.label}
-                  className={`w-8 h-8 rounded-full transition-all duration-200 cursor-pointer ${c.dot} ${isSelected
-                    ? "ring-2 ring-offset-2 ring-offset-white dark:ring-offset-zinc-900 " + c.ring + " scale-110"
-                    : "hover:scale-110 opacity-80 hover:opacity-100"
-                    }`}
-                />
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* Single input: Target Kebiasaan */}
+      {/* Target Kebiasaan — icon trigger + input inline */}
       <div>
         <label htmlFor="habit-input" className="block text-sm font-semibold text-zinc-500 dark:text-zinc-400 mb-2">
           Target Kebiasaan
         </label>
-        <input
-          id="habit-input"
-          type="text"
-          value={input}
-          onChange={(e) => {
-            setInput(e.target.value);
-            setManualStages(null);
-          }}
-          placeholder='Contoh: "Meditasi 30 menit", "Push-up 50 kali"'
-          className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 transition-all text-lg"
-        />
+        <div className="flex items-stretch gap-2">
+          <IconColorPicker icon={icon} color={color} onIconChange={setIcon} onColorChange={setColor} compact />
+          <input
+            id="habit-input"
+            type="text"
+            value={input}
+            onChange={(e) => {
+              setInput(e.target.value);
+              setManualStages(null);
+            }}
+            placeholder='Contoh: "Meditasi 30 menit"'
+            className="flex-1 min-w-0 px-4 py-3 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 transition-all text-lg"
+          />
+        </div>
         {input.trim() && !parsed && (
           <p className="text-xs text-zinc-500 dark:text-zinc-600 mt-2 flex items-center gap-1">
             <Lightbulb size={12} className="text-amber-500 shrink-0" />
@@ -322,7 +270,7 @@ export function CreateHabitForm() {
             <button
               type="button"
               onClick={addStage}
-              className="text-xs px-3 py-1.5 rounded-lg bg-amber-500/15 text-amber-400 hover:bg-amber-500/25 transition-all cursor-pointer font-semibold flex items-center gap-1"
+              className="text-xs px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-600 dark:text-amber-300 hover:bg-amber-500/30 transition-all cursor-pointer font-semibold flex items-center gap-1"
             >
               <Plus size={12} /> Tahap
             </button>
