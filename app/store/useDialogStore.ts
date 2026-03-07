@@ -2,7 +2,6 @@ import { create } from "zustand";
 
 interface DialogState {
   isOpen: boolean;
-  isExiting: boolean;
   title: string;
   message: string;
   confirmLabel: string;
@@ -21,12 +20,10 @@ interface DialogStore extends DialogState {
     onConfirm: () => void;
   }) => void;
   closeDialog: () => void;
-  _finishClose: () => void;
 }
 
 export const useDialogStore = create<DialogStore>((set) => ({
   isOpen: false,
-  isExiting: false,
   title: "",
   message: "",
   confirmLabel: "Ya",
@@ -37,7 +34,6 @@ export const useDialogStore = create<DialogStore>((set) => ({
   openDialog: (opts) =>
     set({
       isOpen: true,
-      isExiting: false,
       title: opts.title,
       message: opts.message,
       confirmLabel: opts.confirmLabel ?? "Ya",
@@ -46,12 +42,9 @@ export const useDialogStore = create<DialogStore>((set) => ({
       onConfirm: opts.onConfirm,
     }),
 
-  closeDialog: () => set({ isExiting: true }),
-
-  _finishClose: () =>
+  closeDialog: () =>
     set({
       isOpen: false,
-      isExiting: false,
       onConfirm: null,
     }),
 }));
