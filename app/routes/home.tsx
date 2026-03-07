@@ -21,7 +21,7 @@ export default function Home() {
     <PageShell
       title={
         <div className="flex items-center gap-2">
-          <img src="/logo.svg" alt="Pukpuk Logo" className="w-7 h-7 drop-shadow-sm" />
+          <img src="/logo.svg" alt="Pukpuk Logo" className="w-7 h-7" />
           <span>Pukpuk</span>
         </div>
       }
