@@ -12,14 +12,32 @@ interface IconColorPickerProps {
 
 export function IconColorPicker({ icon, color, onIconChange, onColorChange, compact }: IconColorPickerProps) {
   const [open, setOpen] = useState(false);
+  const [visible, setVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+
+  const openDropdown = () => {
+    setOpen(true);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => setVisible(true));
+    });
+  };
+
+  const closeDropdown = () => {
+    setVisible(false);
+    setTimeout(() => setOpen(false), 150);
+  };
+
+  const toggleDropdown = () => {
+    if (open) closeDropdown();
+    else openDropdown();
+  };
 
   // Close on click outside
   useEffect(() => {
     if (!open) return;
     function handleClick(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
+        closeDropdown();
       }
     }
     document.addEventListener("mousedown", handleClick);
@@ -35,7 +53,7 @@ export function IconColorPicker({ icon, color, onIconChange, onColorChange, comp
       {compact ? (
         <button
           type="button"
-          onClick={() => setOpen(!open)}
+          onClick={toggleDropdown}
           title="Pilih ikon & warna"
           className={`w-[52px] h-full rounded-xl border flex items-center justify-center transition-all duration-200 cursor-pointer shrink-0 ${selectedColor.bg} ${selectedColor.border} ${open
             ? "ring-2 ring-amber-500/20"
@@ -47,7 +65,7 @@ export function IconColorPicker({ icon, color, onIconChange, onColorChange, comp
       ) : (
         <button
           type="button"
-          onClick={() => setOpen(!open)}
+          onClick={toggleDropdown}
           className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl border transition-all duration-200 cursor-pointer ${open
             ? "border-amber-500/50 ring-2 ring-amber-500/20 bg-zinc-50 dark:bg-zinc-800/70"
             : "border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/50 hover:border-zinc-300 dark:hover:border-zinc-600"
@@ -69,14 +87,17 @@ export function IconColorPicker({ icon, color, onIconChange, onColorChange, comp
 
       {/* Dropdown panel — floating */}
       {open && (
-        <div className="absolute z-50 left-0 mt-2 w-max max-w-sm animate-[fadeIn_0.15s_ease-out]">
+        <div
+          className={`absolute z-50 left-0 mt-2 transition-all duration-150 ease-out ${visible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 -translate-y-1 scale-95 pointer-events-none'}`}
+          style={{ width: 'calc(9 * 2.25rem + 8 * 0.375rem + 2rem)' }}
+        >
           <div className="rounded-xl border border-zinc-200 dark:border-zinc-700/50 bg-white dark:bg-zinc-900 shadow-2xl shadow-black/15 dark:shadow-black/40 p-4 space-y-4">
             {/* Icons grid */}
             <div>
               <label className="block text-[11px] font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-2">
                 Ikon
               </label>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="grid grid-cols-9 gap-1.5">
                 {HABIT_ICONS.map((opt) => {
                   const IconComp = opt.icon;
                   const isSelected = icon === opt.name;
