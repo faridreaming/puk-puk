@@ -4,6 +4,7 @@ import { useHabitStore } from "~/store/useHabitStore";
 import { getHabitIcon, getHabitColor } from "~/lib/habitMeta";
 import { IconColorPicker } from "~/components/IconColorPicker";
 import type { HabitTemplate } from "~/components/TemplateModal";
+import { useDialogStore } from "~/store/useDialogStore";
 import { Lightbulb, Check, Flag, Rocket, Heart, Plus, X, ChevronDown, ChevronUp } from "lucide-react";
 
 interface StageInput {
@@ -64,6 +65,7 @@ interface CreateHabitFormProps {
 export function CreateHabitForm({ selectedTemplate }: CreateHabitFormProps) {
   const addHabit = useHabitStore((s) => s.addHabit);
   const navigate = useNavigate();
+  const { openDialog } = useDialogStore();
 
   const [input, setInput] = useState("");
   const [icon, setIcon] = useState("target");
@@ -118,6 +120,17 @@ export function CreateHabitForm({ selectedTemplate }: CreateHabitFormProps) {
     if (current.length > 1) {
       setManualStages(current.filter((_, i) => i !== index));
     }
+  };
+
+  const handleRemoveStage = (index: number) => {
+    openDialog({
+      title: "Hapus Tahap?",
+      message: "Apakah kamu yakin ingin menghapus tahap ini?",
+      confirmLabel: "Hapus",
+      cancelLabel: "Batal",
+      variant: "danger",
+      onConfirm: () => removeStage(index),
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -275,34 +288,39 @@ export function CreateHabitForm({ selectedTemplate }: CreateHabitFormProps) {
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2 w-full">
                         <input
                           type="text"
                           value={stage.label}
                           onChange={(e) => updateStage(index, "label", e.target.value)}
                           placeholder={`Tahap ${index + 1}`}
-                          className="flex-1 px-3 py-1.5 bg-white dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/50 rounded-lg text-sm text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-amber-500/40 transition-all"
+                          className="flex-[1_1_180px] min-w-0 px-3 py-1.5 bg-white dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/50 rounded-lg text-sm text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-amber-500/40 transition-all"
                         />
-                        <div className="flex items-center gap-1 shrink-0">
-                          <input
-                            type="number"
-                            value={stage.targetDays}
-                            onChange={(e) => updateStage(index, "targetDays", e.target.value)}
-                            min="1"
-                            max="365"
-                            className="w-14 px-2 py-1.5 bg-white dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/50 rounded-lg text-sm text-zinc-900 dark:text-zinc-100 text-center focus:outline-none focus:ring-1 focus:ring-amber-500/40 transition-all"
-                          />
-                          <span className="text-[10px] text-zinc-600">hari</span>
+                        <div className="flex flex-1 sm:flex-none justify-end gap-2 shrink-0">
+                          <div className="flex items-center bg-white dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/50 rounded-lg overflow-hidden transition-colors focus-within:ring-1 focus-within:ring-amber-500/40 focus-within:border-amber-500/40">
+                            <input
+                              type="number"
+                              value={stage.targetDays}
+                              onChange={(e) => updateStage(index, "targetDays", e.target.value)}
+                              min="1"
+                              max="365"
+                              className="w-12 sm:w-12 px-2 py-1.5 text-sm text-zinc-900 dark:text-zinc-100 text-center bg-transparent border-none focus:outline-none"
+                            />
+                            <div className="px-2 py-1.5 bg-zinc-50 dark:bg-zinc-800/80 border-l border-zinc-200 dark:border-zinc-700/50 text-[10px] sm:text-xs text-zinc-500 dark:text-zinc-400 font-medium select-none">
+                              Hari
+                            </div>
+                          </div>
+                          {stages.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveStage(index)}
+                              className="px-2.5 sm:px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm transition-colors shrink-0 flex items-center justify-center font-medium shadow-sm"
+                            >
+                              <span className="hidden sm:inline">Hapus</span>
+                              <X size={16} className="sm:hidden" />
+                            </button>
+                          )}
                         </div>
-                        {stages.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={() => removeStage(index)}
-                            className="text-zinc-700 hover:text-red-400 transition-colors cursor-pointer opacity-0 group-hover:opacity-100"
-                          >
-                            <X size={16} />
-                          </button>
-                        )}
                       </div>
                     </div>
                   </div>
