@@ -35,8 +35,11 @@ export function HabitCard({ habit }: HabitCardProps) {
     ? Math.round((habit.completedDates.length / totalDaysTracked) * 100)
     : 0;
 
+  const stageTarget = currentStage ? (currentStage.targetCount ?? currentStage.targetDays ?? 1) : 1;
+  const stageUnit = currentStage ? (currentStage.unit ?? "Hari") : "Hari";
+
   const stageProgress = currentStage
-    ? Math.min(100, (habit.currentStageProgress / currentStage.targetDays) * 100)
+    ? Math.min(100, (habit.currentStageProgress / stageTarget) * 100)
     : 0;
 
   const IconComponent = getHabitIcon(habit.icon);
@@ -140,7 +143,7 @@ export function HabitCard({ habit }: HabitCardProps) {
           <div className="mt-3">
             <div className="flex items-center justify-between mb-1">
               <span className={`text-[11px] font-semibold ${colorTheme.text}`}>
-                {habit.currentStageProgress}/{currentStage.targetDays} hari
+                {habit.currentStageProgress}/{stageTarget} {stageUnit.toLowerCase()}
               </span>
               <span className="text-[11px] text-zinc-400 dark:text-zinc-600 tabular-nums">
                 {Math.round(stageProgress)}%

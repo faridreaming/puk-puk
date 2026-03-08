@@ -19,8 +19,11 @@ export function StageRoadmap({
           const isCompleted = index < currentStageIndex;
           const isCurrent = index === currentStageIndex;
           const isLast = index === stages.length - 1;
+          const stageTarget = stage.targetCount ?? stage.targetDays ?? 1;
+          const stageUnit = stage.unit ?? "Hari";
+
           const progress = isCurrent
-            ? Math.min((currentStageProgress / stage.targetDays) * 100, 100)
+            ? Math.min((currentStageProgress / stageTarget) * 100, 100)
             : isCompleted
               ? 100
               : 0;
@@ -51,17 +54,17 @@ export function StageRoadmap({
                 </div>
                 <span
                   className={`text-xs mt-1.5 text-center max-w-[80px] truncate ${isCurrent
-                      ? "text-amber-500 dark:text-amber-400 font-semibold"
-                      : isCompleted
-                        ? "text-emerald-500 dark:text-emerald-400"
-                        : "text-zinc-400 dark:text-zinc-600"
+                    ? "text-amber-500 dark:text-amber-400 font-semibold"
+                    : isCompleted
+                      ? "text-emerald-500 dark:text-emerald-400"
+                      : "text-zinc-400 dark:text-zinc-600"
                     }`}
                 >
                   {stage.label}
                 </span>
                 {isCurrent && (
                   <span className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-0.5">
-                    {currentStageProgress}/{stage.targetDays} hari
+                    {currentStageProgress}/{stageTarget} {stageUnit.toLowerCase()}
                   </span>
                 )}
               </div>

@@ -246,13 +246,13 @@ export default function HabitDetail({ params }: Route.ComponentProps) {
                     <div className="flex items-center justify-between text-xs mb-1.5">
                       <span className="text-zinc-500 font-medium">Progres tahap</span>
                       <span className="font-bold text-zinc-700 dark:text-zinc-300 tabular-nums">
-                        {habit.currentStageProgress}/{currentStage.targetDays} hari
+                        {habit.currentStageProgress}/{currentStage.targetCount ?? currentStage.targetDays} {(currentStage.unit ?? "Hari").toLowerCase()}
                       </span>
                     </div>
                     <div className="h-2 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-amber-500 rounded-full transition-all duration-500"
-                        style={{ width: `${Math.min(100, (habit.currentStageProgress / currentStage.targetDays) * 100)}%` }}
+                        style={{ width: `${Math.min(100, (habit.currentStageProgress / (currentStage.targetCount ?? currentStage.targetDays ?? 1)) * 100)}%` }}
                       />
                     </div>
                   </div>

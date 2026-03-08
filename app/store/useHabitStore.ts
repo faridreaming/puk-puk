@@ -4,10 +4,15 @@ import { getToday, getTodayDate } from "~/store/useDevStore";
 
 // --- Types ---
 
+export type HabitCategory = 'quantitative' | 'frequency' | 'abstinence';
+
 export interface HabitStage {
   id: string;
   label: string;
-  targetDays: number;
+  targetCount: number;
+  unit: string;
+  // Legacy support for existing users
+  targetDays?: number;
 }
 
 export interface Habit {
@@ -16,6 +21,7 @@ export interface Habit {
   icon: string;
   color: string;
   targetLabel: string;
+  category?: HabitCategory; // Optional for backward compatibility
   stages: HabitStage[];
   currentStageIndex: number;
   lives: number;
@@ -91,6 +97,7 @@ export const useHabitStore = create<HabitStore>()(
           ...data,
           id: generateId(),
           color: data.color || "amber",
+          category: data.category || 'quantitative', // Default for legacy support
           currentStageIndex: 0,
           lives: data.maxLives,
           completedDates: [],
@@ -123,7 +130,8 @@ export const useHabitStore = create<HabitStore>()(
 
             const newProgress = habit.currentStageProgress + 1;
             const currentStage = habit.stages[habit.currentStageIndex];
-            const reachedStageTarget = currentStage && newProgress >= currentStage.targetDays;
+            const target = currentStage ? (currentStage.targetCount ?? currentStage.targetDays ?? 1) : 1;
+            const reachedStageTarget = newProgress >= target;
 
             if (reachedStageTarget) {
               result = { type: "complete", stageUp: true };
