@@ -55,7 +55,7 @@ export function IconColorPicker({ icon, color, onIconChange, onColorChange, comp
           type="button"
           onClick={toggleDropdown}
           title="Pilih ikon & warna"
-          className={`w-[52px] h-full rounded-xl border flex items-center justify-center transition-all duration-200 cursor-pointer shrink-0 ${selectedColor.bg} ${selectedColor.border} ${open
+          className={`h-full px-2.5 rounded-xl border flex items-center justify-center transition-all duration-200 cursor-pointer shrink-0 ${selectedColor.bg} ${selectedColor.border} ${open
             ? "ring-2 ring-amber-500/20"
             : ""
             }`}

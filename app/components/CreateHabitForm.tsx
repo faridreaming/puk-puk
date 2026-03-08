@@ -139,7 +139,7 @@ function generateStages(targetNumber: number, activityUnit: string, category: Ha
   // Determine default tracking unit based on activity unit.
   const isFrequency = activityUnit.toLowerCase().startsWith("x") || activityUnit.toLowerCase() === "kali";
   let stageUnit = "Hari";
-  let freqPeriodText = "hari"; // For label: "1 kali sehari"
+  let freqPeriodText = "hari"; // For label: "1x sehari"
 
   if (isFrequency) {
     if (activityUnit.includes("seminggu")) {
@@ -170,7 +170,7 @@ function generateStages(targetNumber: number, activityUnit: string, category: Ha
     let label = `${value} ${activityUnit}`;
 
     if (isFrequency) {
-      label = `${value} kali ${freqPeriodText}`;
+      label = `${value}x ${freqPeriodText}`;
     }
 
     if (stages.length > 0 && stages[stages.length - 1].label === label) continue;
@@ -188,7 +188,7 @@ function generateStages(targetNumber: number, activityUnit: string, category: Ha
     let label = `${value} ${activityUnit}`;
 
     if (isFrequency) {
-      label = `${value} kali ${freqPeriodText}`;
+      label = `${value}x ${freqPeriodText}`;
     }
 
     stages.push({
@@ -329,7 +329,7 @@ export function CreateHabitForm({ selectedTemplate }: CreateHabitFormProps) {
 
       {/* Habit Details Group */}
       <div className="space-y-3">
-        <div className="flex items-center justify-between mb-1">
+        <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-1.5">
             <label className="block text-sm font-semibold text-zinc-500 dark:text-zinc-400">
               Target Kebiasaan
@@ -362,14 +362,13 @@ export function CreateHabitForm({ selectedTemplate }: CreateHabitFormProps) {
               />
             </div>
           </div>
-          <p className="text-[11px] text-zinc-500 dark:text-zinc-500 px-1 opacity-80">
-            Ketik bebas dengan format Kuantitas (<span className="text-zinc-700 dark:text-zinc-300">Lari 5 km</span>), Frekuensi (<span className="text-zinc-700 dark:text-zinc-300">Olahraga 3x seminggu</span>), atau Pantangan (<span className="text-zinc-700 dark:text-zinc-300">Berhenti Merokok 14 hari</span>).
-          </p>
           {targetData && input.trim() && (
             <div className="flex items-center gap-1.5 px-1 text-xs">
               <Check size={14} className="text-emerald-500 shrink-0" />
               <span className="text-zinc-500 dark:text-zinc-400">
-                Terdeteksi: <span className="font-semibold text-emerald-600 dark:text-emerald-400">{targetData.activity}</span> dengan target <span className="font-semibold text-emerald-600 dark:text-emerald-400">{targetData.targetNumber} {targetData.unit?.toLowerCase()}</span>
+                Terdeteksi: <span className="font-semibold text-emerald-600 dark:text-emerald-400">{targetData.activity}</span> dengan target <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                  {targetData.category === "frequency" ? `${targetData.targetNumber}${targetData.unit?.toLowerCase()}` : `${targetData.targetNumber} ${targetData.unit?.toLowerCase()}`}
+                </span>
               </span>
             </div>
           )}
@@ -414,7 +413,7 @@ export function CreateHabitForm({ selectedTemplate }: CreateHabitFormProps) {
       {/* Stages — visual roadmap */}
       {stages && stages.length > 0 && (
         <div>
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-1.5">
               <label className="block text-sm font-semibold text-zinc-500 dark:text-zinc-400">
                 Peta Perjalananmu
@@ -561,7 +560,7 @@ export function CreateHabitForm({ selectedTemplate }: CreateHabitFormProps) {
 
                     <div className="flex items-center gap-2 w-full opacity-80 pointer-events-none">
                       <div className="flex-1 px-3 py-2 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-lg text-sm text-emerald-700 dark:text-emerald-300 font-medium">
-                        {targetData.targetNumber} {targetData.unit}
+                        {targetData.category === "frequency" ? `${targetData.targetNumber}${targetData.unit}` : `${targetData.targetNumber} ${targetData.unit}`}
                       </div>
                       <div className="px-3 py-2 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-lg text-sm text-emerald-600 dark:text-emerald-400 font-medium whitespace-nowrap shrink-0">
                         Tanpa Batas
@@ -578,7 +577,7 @@ export function CreateHabitForm({ selectedTemplate }: CreateHabitFormProps) {
               {targetData?.category === "abstinence" ? (
                 <span>Target: Bertahan 1 hari demi 1 hari hingga mencapai {targetData?.targetNumber} hari.</span>
               ) : (
-                <span>Total ±{stages.reduce((sum, s) => sum + (parseInt(s.targetCount) || 0), 0)} {targetData?.unit || "sesi"}</span>
+                <span>Total ±{stages.reduce((sum, s) => sum + (parseInt(s.targetCount) || 0), 0)} {stages.length > 0 ? stages[0].unit : (targetData?.unit || "sesi")}</span>
               )}
             </div>
           </div>
