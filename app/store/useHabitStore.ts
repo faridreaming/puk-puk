@@ -109,12 +109,23 @@ export const useHabitStore = create<HabitStore>()(
             if (habit.id !== habitId) return habit;
             if (habit.completedDates.includes(date) || habit.missedDates.includes(date)) return habit;
 
+            const isTargetPhase = habit.currentStageIndex >= habit.stages.length;
+
+            if (isTargetPhase) {
+              // Infinite tracking in Target phase
+              result = { type: "complete", stageUp: false };
+              return {
+                ...habit,
+                completedDates: [...habit.completedDates, date],
+                currentStageProgress: habit.currentStageProgress + 1,
+              };
+            }
+
             const newProgress = habit.currentStageProgress + 1;
             const currentStage = habit.stages[habit.currentStageIndex];
-            const reachedTarget = currentStage && newProgress >= currentStage.targetDays;
-            const isLastStage = habit.currentStageIndex >= habit.stages.length - 1;
+            const reachedStageTarget = currentStage && newProgress >= currentStage.targetDays;
 
-            if (reachedTarget && !isLastStage) {
+            if (reachedStageTarget) {
               result = { type: "complete", stageUp: true };
               return {
                 ...habit,
@@ -129,7 +140,7 @@ export const useHabitStore = create<HabitStore>()(
             return {
               ...habit,
               completedDates: [...habit.completedDates, date],
-              currentStageProgress: reachedTarget ? currentStage.targetDays : newProgress,
+              currentStageProgress: newProgress,
             };
           }),
         }));

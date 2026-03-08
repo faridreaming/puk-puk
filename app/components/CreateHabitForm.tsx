@@ -20,39 +20,34 @@ interface StageInput {
 const TARGET_REGEX = /^(.+?)\s+(\d+)\s*(.+)$/;
 
 function generateStages(targetNumber: number, unit: string): StageInput[] {
-  // Generate 5 progressive stages
-  // Use nice round-ish fractions: ~15%, ~30%, ~50%, ~75%, 100%
-  const fractions = [0.15, 0.3, 0.5, 0.75, 1.0];
+  // Generate progressive stages up to 75% of target
+  const fractions = [0.15, 0.3, 0.5, 0.75];
   const stages: StageInput[] = [];
 
   for (const frac of fractions) {
     let value = Math.ceil(targetNumber * frac);
-    // Make values "rounder" for better UX
     if (targetNumber >= 20) {
       value = Math.ceil(value / 5) * 5; // Round up to nearest 5
     }
-    // Clamp to max
-    if (value > targetNumber) value = targetNumber;
+    // Clamp so the stage target doesn't reach the final target
+    if (value >= targetNumber) value = targetNumber - 1;
+    if (value < 1) value = 1;
 
     const label = `${value} ${unit}`;
-    // Avoid duplicate stages
     if (stages.length > 0 && stages[stages.length - 1].label === label) continue;
 
     stages.push({
       label,
-      targetDays: value === targetNumber ? "21" : stages.length < 2 ? "7" : "14",
+      targetDays: stages.length === 0 ? "7" : "14",
     });
   }
 
-  // Ensure last stage is exactly the target
-  if (stages.length > 0) {
-    const last = stages[stages.length - 1];
-    if (last.label !== `${targetNumber} ${unit}`) {
-      stages.push({
-        label: `${targetNumber} ${unit}`,
-        targetDays: "21",
-      });
-    }
+  // Ensure at least one stage exists if target > 1
+  if (stages.length === 0 && targetNumber > 1) {
+    stages.push({
+      label: `${Math.ceil(targetNumber / 2)} ${unit}`,
+      targetDays: "7",
+    });
   }
 
   return stages;
@@ -284,7 +279,7 @@ export function CreateHabitForm({ selectedTemplate }: CreateHabitFormProps) {
                     <div className="flex-1 pb-4">
                       <div className="flex items-center gap-2 mb-1.5">
                         <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: `hsl(${hue}, 70%, 60%)` }}>
-                          {isFirst ? "Mulai" : isLast ? "Target" : `Tahap ${index + 1}`}
+                          {isFirst ? "Mulai" : `Tahap ${index + 1}`}
                         </span>
                       </div>
 
@@ -314,7 +309,7 @@ export function CreateHabitForm({ selectedTemplate }: CreateHabitFormProps) {
                             <button
                               type="button"
                               onClick={() => handleRemoveStage(index)}
-                              className="px-2.5 sm:px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm transition-colors shrink-0 flex items-center justify-center font-medium shadow-sm"
+                              className="px-2.5 sm:px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm transition-colors shrink-0 flex items-center justify-center font-medium shadow-sm cursor-pointer"
                             >
                               <span className="hidden sm:inline">Hapus</span>
                               <X size={16} className="sm:hidden" />
@@ -326,6 +321,38 @@ export function CreateHabitForm({ selectedTemplate }: CreateHabitFormProps) {
                   </div>
                 );
               })}
+
+              {/* Static Target Block */}
+              {parsed && (
+                <div className="relative flex items-start gap-3 group mt-2">
+                  {/* Node */}
+                  <div className="relative z-10 flex flex-col items-center">
+                    <div
+                      className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-md bg-linear-to-br from-emerald-400 to-emerald-500 shadow-emerald-500/30 shrink-0"
+                    >
+                      <Flag size={12} strokeWidth={3.5} />
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-500">
+                        Target
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2 w-full opacity-80 pointer-events-none">
+                      <div className="flex-1 px-3 py-2 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-lg text-sm text-emerald-700 dark:text-emerald-300 font-medium">
+                        {parsed.targetNumber} {parsed.unit}
+                      </div>
+                      <div className="px-3 py-2 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-lg text-sm text-emerald-600 dark:text-emerald-400 font-medium whitespace-nowrap shrink-0">
+                        Tanpa Batas
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Summary */}

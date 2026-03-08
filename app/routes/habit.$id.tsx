@@ -13,7 +13,7 @@ import { StatCard } from "~/components/ui/StatCard";
 import { IconButton } from "~/components/ui/IconButton";
 import type { Route } from "./+types/habit.$id";
 import { useState } from "react";
-import { Pencil, Check, X, Undo2, Flame, RotateCcw, Trash2, Search, ChevronDown } from "lucide-react";
+import { Pencil, Check, X, Undo2, Flame, RotateCcw, Trash2, Search, ChevronDown, Trophy } from "lucide-react";
 import { useToday } from "~/store/useDevStore";
 import { HABIT_ICONS, HABIT_COLORS, getHabitIcon, getHabitColor } from "~/lib/habitMeta";
 import { IconColorPicker } from "~/components/IconColorPicker";
@@ -61,9 +61,8 @@ export default function HabitDetail({ params }: Route.ComponentProps) {
     habit.completedDates.includes(today) || habit.missedDates.includes(today);
   const completedToday = habit.completedDates.includes(today);
   const currentStage = habit.stages[habit.currentStageIndex];
-  const isLastStage = habit.currentStageIndex >= habit.stages.length - 1;
-  const isComplete =
-    isLastStage && currentStage && habit.currentStageProgress >= currentStage.targetDays;
+  const isTargetPhase = habit.currentStageIndex >= habit.stages.length;
+  const isComplete = false; // Complete state that disables actions is removed
 
   const totalDaysTracked = habit.completedDates.length + habit.missedDates.length;
   const successRate =
@@ -232,7 +231,7 @@ export default function HabitDetail({ params }: Route.ComponentProps) {
                 <LivesIndicator lives={habit.lives} maxLives={habit.maxLives} />
               </div>
 
-              {!isComplete && currentStage ? (
+              {!isTargetPhase && currentStage ? (
                 <div className="space-y-3">
                   {/* Current stage label + number */}
                   <div className="flex items-center gap-2">
@@ -264,16 +263,31 @@ export default function HabitDetail({ params }: Route.ComponentProps) {
                     <span className="text-sm font-semibold text-zinc-600 dark:text-zinc-400">{habit.targetLabel}</span>
                   </div>
                 </div>
-              ) : (
-                <div className="mt-1 px-4 py-2.5 bg-emerald-50 dark:bg-emerald-500/15 border border-emerald-200 dark:border-emerald-500/20 rounded-xl text-emerald-600 dark:text-emerald-400 font-semibold text-sm text-center flex items-center justify-center gap-1.5">
-                  <Check size={16} />
-                  Selamat! Target tercapai: {habit.targetLabel}
+              ) : isTargetPhase ? (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center gap-1">
+                      <Trophy size={11} /> Target
+                    </span>
+                    <p className="text-base font-bold text-zinc-900 dark:text-zinc-100">{habit.targetLabel}</p>
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-between text-xs mb-1.5">
+                      <span className="text-zinc-500 font-medium">Fase Mempertahankan Habit</span>
+                      <span className="font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">∞</span>
+                    </div>
+                    <div className="h-2 bg-emerald-100 dark:bg-emerald-500/20 rounded-full overflow-hidden relative">
+                      <div
+                        className="absolute inset-0 bg-linear-to-r from-emerald-400/20 via-emerald-400 to-emerald-400/20 w-[200%] animate-[shimmer_3s_linear_infinite]"
+                      />
+                    </div>
+                  </div>
                 </div>
-              )}
+              ) : null}
             </Section>
 
             {/* Daily action */}
-            {!isComplete && (
+            {true && (
               <Section>
                 <SectionLabel className="mb-1">Hari Ini</SectionLabel>
                 <p className="text-base font-semibold text-zinc-700 dark:text-zinc-300 mb-4">{currentStage?.label}</p>

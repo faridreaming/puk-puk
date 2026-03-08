@@ -26,9 +26,8 @@ export function HabitCard({ habit }: HabitCardProps) {
   const completedToday = habit.completedDates.includes(today);
 
   const currentStage = habit.stages[habit.currentStageIndex];
-  const isLastStage = habit.currentStageIndex >= habit.stages.length - 1;
-  const isComplete =
-    isLastStage && currentStage && habit.currentStageProgress >= currentStage.targetDays;
+  const isTargetPhase = habit.currentStageIndex >= habit.stages.length;
+  const isComplete = false; // "Complete" that blocks check-ins no longer exists, it goes into Target Phase
 
   const streak = getStreak(habit.completedDates, habit.missedDates);
   const totalDaysTracked = habit.completedDates.length + habit.missedDates.length;
@@ -123,9 +122,9 @@ export function HabitCard({ habit }: HabitCardProps) {
             <h3 className="font-bold text-zinc-900 dark:text-zinc-100 text-[15px] leading-tight truncate">
               {habit.name}
             </h3>
-            {isComplete ? (
+            {isTargetPhase ? (
               <span className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold inline-flex items-center gap-1 mt-0.5">
-                <Trophy size={11} /> Target tercapai!
+                <Trophy size={11} /> Fase Mempertahankan Target
               </span>
             ) : currentStage ? (
               <span className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5 block truncate">
@@ -137,7 +136,7 @@ export function HabitCard({ habit }: HabitCardProps) {
         </Link>
 
         {/* Stage progress — flat inline style */}
-        {!isComplete && currentStage && (
+        {!isTargetPhase && currentStage && (
           <div className="mt-3">
             <div className="flex items-center justify-between mb-1">
               <span className={`text-[11px] font-semibold ${colorTheme.text}`}>
@@ -151,6 +150,24 @@ export function HabitCard({ habit }: HabitCardProps) {
               <div
                 className={`h-full rounded-full transition-all duration-500 ${colorTheme.dot}`}
                 style={{ width: `${stageProgress}%` }}
+              />
+            </div>
+          </div>
+        )}
+
+        {isTargetPhase && (
+          <div className="mt-3">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                Target {habit.targetLabel}
+              </span>
+              <span className="text-[11px] text-zinc-400 dark:text-zinc-600 tabular-nums">
+                ∞
+              </span>
+            </div>
+            <div className="h-2 bg-emerald-100 dark:bg-emerald-500/20 rounded-full overflow-hidden relative">
+              <div
+                className="absolute inset-0 bg-linear-to-r from-emerald-400/20 via-emerald-400 to-emerald-400/20 w-[200%] animate-[shimmer_3s_linear_infinite]"
               />
             </div>
           </div>
@@ -173,49 +190,47 @@ export function HabitCard({ habit }: HabitCardProps) {
         </div>
 
         {/* Action area */}
-        {!isComplete && (
-          <div className="mt-3">
-            {alreadyTrackedToday ? (
-              <div className="flex items-center justify-between">
-                <span className={`inline-flex items-center gap-1.5 text-sm font-medium ${completedToday
-                  ? "text-emerald-600 dark:text-emerald-400"
-                  : "text-red-500 dark:text-red-400"
-                  }`}>
-                  {completedToday ? <Check size={15} strokeWidth={2.5} /> : <X size={15} strokeWidth={2.5} />}
-                  {completedToday ? "Selesai" : "Terlewat"}
-                </span>
-                <button
-                  onClick={handleUndo}
-                  className="flex items-center gap-1 text-[11px] text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors cursor-pointer px-2 py-1 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                >
-                  <Undo2 size={11} />
-                  Batalkan
-                </button>
-              </div>
-            ) : (
-              <div className="flex gap-2">
-                <ActionButton
-                  variant="success"
-                  onClick={handleComplete}
-                  className="flex-1"
-                  size="sm"
-                >
-                  <Check size={15} strokeWidth={2.5} />
-                  Selesai
-                </ActionButton>
-                <ActionButton
-                  variant="ghost"
-                  onClick={handleMissed}
-                  className="flex-1"
-                  size="sm"
-                >
-                  <X size={15} strokeWidth={2.5} />
-                  Terlewat
-                </ActionButton>
-              </div>
-            )}
-          </div>
-        )}
+        <div className="mt-3">
+          {alreadyTrackedToday ? (
+            <div className="flex items-center justify-between">
+              <span className={`inline-flex items-center gap-1.5 text-sm font-medium ${completedToday
+                ? "text-emerald-600 dark:text-emerald-400"
+                : "text-red-500 dark:text-red-400"
+                }`}>
+                {completedToday ? <Check size={15} strokeWidth={2.5} /> : <X size={15} strokeWidth={2.5} />}
+                {completedToday ? "Selesai" : "Terlewat"}
+              </span>
+              <button
+                onClick={handleUndo}
+                className="flex items-center gap-1 text-[11px] text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors cursor-pointer px-2 py-1 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              >
+                <Undo2 size={11} />
+                Batalkan
+              </button>
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <ActionButton
+                variant="success"
+                onClick={handleComplete}
+                className="flex-1"
+                size="sm"
+              >
+                <Check size={15} strokeWidth={2.5} />
+                Selesai
+              </ActionButton>
+              <ActionButton
+                variant="ghost"
+                onClick={handleMissed}
+                className="flex-1"
+                size="sm"
+              >
+                <X size={15} strokeWidth={2.5} />
+                Terlewat
+              </ActionButton>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
